@@ -2,11 +2,11 @@
 
 Assignment implementation for NeevAI SuperCloud Pvt. Ltd.
 
-Smart Expense Splitter is a lightweight group expense management web app built with Next.js 14, TypeScript, and Tailwind CSS. It lets users create groups, add members, record shared expenses, split costs equally or with custom amounts, track balances in real time, and view clear settlement suggestions. Optional AI enhancements are included for expense categorization and spending insights, with local fallbacks so the product remains usable even without an API key.
+Smart Expense Splitter is a lightweight group expense management web app built with Next.js 14, TypeScript, and Tailwind CSS. It helps users create groups, add members, record shared expenses, split costs equally or with custom amounts, track balances in real time, and view clear settlement suggestions. The app also includes optional AI support for expense categorization and spending insights, with local fallbacks so the product remains usable even without a live API key.
 
 ## Assignment Overview
 
-The shared PDF asks for a web application that:
+The PDF asks for a web application that:
 
 - enables users to create groups and add members
 - allows adding and splitting expenses equally or with custom shares
@@ -26,69 +26,52 @@ Submission requirements mentioned in the PDF:
 3. Record a demo video under 5 minutes.
 4. Deploy the app on Vercel or Netlify.
 
-## Solution Summary
+## Project Status
 
-This repository implements the Smart Expense Splitter problem statement in a local-first architecture optimized for speed, clarity, and smooth UX.
-
-Implemented outcomes:
-
-- group creation with validation
-- member management during and after group creation
-- equal split and custom split expenses
-- automatic balance calculation
-- debt summary and settlement suggestions
-- settlement history tracking
-- analytics dashboard with category and daily spending charts
-- optional AI expense categorization
-- optional AI-powered spending insights
-
-Current submission status:
-
-- application code: complete
-- README and architecture documentation: complete
-- deployment readiness: complete
-- public GitHub repo: to be completed from your account
-- demo video: to be completed by you
-- final hosted link: to be completed from your account
+- core Smart Expense Splitter features: implemented
+- responsive UI for mobile, tablet, and laptop: implemented
+- AI categorization and spending insights: implemented
+- Vercel deployment target: configured
+- public GitHub repo, final live URL, and demo video: to be completed from your accounts
 
 ## Feature Implementation
 
-### 1. Group Management
+### Group Management
 
-- users can create a group with a name, optional description, and at least two members
-- duplicate member names and duplicate emails are rejected
-- users can add members later from the group details page
-- groups are stored locally and restored on refresh
+- create groups with name, optional description, and at least two members
+- validate duplicate member names and duplicate emails
+- add members after group creation
+- persist groups locally and restore them on refresh
 
-### 2. Expense Management
+### Expense Management
 
-- users can add an expense with description, amount, category, date, payer, and split type
-- equal split mode distributes the amount across all members
-- custom split mode allows exact per-member allocations
-- custom split values are validated against the total amount
-- expense history supports sorting and filtering
+- add expenses with description, amount, category, date, payer, and split type
+- split expenses equally across all members
+- split expenses with custom per-member amounts
+- validate custom split totals against the full amount
+- sort and filter expense history
 
-### 3. Balances and Settlements
+### Balances and Settlements
 
-- balances are recalculated automatically after every expense or settlement
-- the app shows who owes whom and how much
-- a settlement suggestion algorithm minimizes the number of transactions
-- completed settlements are persisted in group history
+- calculate balances automatically after every expense or settlement
+- show who owes whom and how much
+- suggest settlements to reduce the number of transactions
+- persist completed settlement history
 
-### 4. Analytics and AI
+### Analytics and AI
 
-- spending charts show category distribution and recent daily spending
-- AI categorization suggests categories from expense descriptions
-- AI insights summarize spending behavior and unusual patterns
-- if no API key is present, local fallback logic keeps AI-related UX functional
+- category distribution chart
+- daily spending chart
+- AI expense categorization
+- AI-generated spending insights
+- local fallback logic when the API key is not configured
 
-### 5. UX and UI
+### UX and UI
 
-- responsive layout for mobile, tablet, and laptop screens
-- clear modal-based flows for creating groups, adding members, and adding expenses
-- reusable UI primitives for consistency
-- readable balance and settlement presentation
-- full-name member chips instead of ambiguous initials
+- responsive layout across mobile, tablet, and laptop breakpoints
+- modal-based flows for creating groups, adding members, and adding expenses
+- clearer group header and member presentation
+- full-name member chips instead of initials-only badges
 
 ## Evaluation Criteria Mapping
 
@@ -98,7 +81,7 @@ The core assignment requirements from the PDF are implemented, along with option
 
 ### Code Quality and Scalability
 
-The codebase is modular and separated by route, feature, shared business logic, and types. Reusable utilities and UI primitives are centralized to reduce duplication.
+The codebase is modular and separated by route, feature, shared business logic, and types. Reusable utilities and UI primitives reduce duplication and keep the project easier to extend.
 
 ### Real-Time Performance
 
@@ -106,15 +89,15 @@ The app uses a local-first flow with instant UI updates and `localStorage` persi
 
 ### AI Accuracy
 
-AI is applied to the Smart Expense Splitter use case from the PDF: expense categorization and spending insights. If a live API key is unavailable, the app falls back to deterministic local logic instead of breaking the workflow.
+AI is applied to the Smart Expense Splitter workflow from the PDF: expense categorization and spending insights. If a live API key is unavailable, the app falls back to deterministic local logic instead of breaking the experience.
 
 ### UX and UI
 
-The interface is designed to be lightweight, responsive, and easy to use during common group-expense workflows.
+The interface is designed to be clean, fast, and easy to use for common group-expense workflows.
 
 ### Bonus Points
 
-Additional improvements include settlement history persistence, reusable member chips, AI fallback mode, responsive layout polish, and cleaner assignment-ready documentation.
+Additional improvements include settlement history persistence, reusable member chips, AI fallback mode, responsive layout polish, and professional project documentation.
 
 ## Tech Stack
 
@@ -131,24 +114,24 @@ Additional improvements include settlement history persistence, reusable member 
 ### Frontend
 
 - App Router pages under `src/app`
-- client-side interactive components for group, expense, and settlement workflows
+- client-side interactive components for group, expense, settlement, and analytics flows
 - reusable UI layer for shared presentation patterns
 
 ### State and Persistence
 
 - browser `localStorage` acts as the persistence layer
-- `useGroups` is the main client hook for group state orchestration
-- storage normalization keeps persisted data shape predictable
+- `useGroups` is the primary client hook for group state orchestration
+- storage normalization keeps persisted data predictable
 
 ### Business Logic
 
-- `src/lib/calculations.ts` handles balance and settlement calculations
-- `src/lib/utils.ts` contains shared formatting and UI helpers
+- `src/lib/calculations.ts` handles balances and settlement calculations
+- `src/lib/utils.ts` contains formatting and shared helpers
 - domain types are centralized in `src/types/index.ts`
 
 ### API Layer
 
-The app exposes lightweight API routes for validation and request shaping:
+The app exposes lightweight API routes for validation and AI request handling:
 
 - `POST /api/groups`
 - `POST /api/expenses`
@@ -226,7 +209,7 @@ npm install
 
 ### 2. Configure Environment Variables
 
-Use the included `.env.example` file as a template. It documents which environment variables the project expects.
+Use `.env.example` as the template for required environment variables.
 
 Create `.env.local` in the project root and add your real values:
 
@@ -237,7 +220,7 @@ OPENAI_MODEL=gpt-4.1-mini
 
 Environment file roles:
 
-- `.env.local`: your real local secrets, never commit this file
+- `.env.local`: real local secrets, never commit this file
 - `.env.example`: safe sample file for setup reference and deployment guidance
 
 If `OPENAI_API_KEY` is not set, the app still works using local fallback logic for categorization and insights.
@@ -248,7 +231,7 @@ If `OPENAI_API_KEY` is not set, the app still works using local fallback logic f
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open `http://localhost:3000`.
 
 ## AI Setup
 
@@ -261,7 +244,7 @@ To enable live AI:
 
 1. Create an OpenAI API key in your OpenAI dashboard.
 2. Put the key in `.env.local` as `OPENAI_API_KEY`.
-3. Optionally set `OPENAI_MODEL` if you want to change the default model.
+3. Optionally set `OPENAI_MODEL` if you want to override the default model.
 4. Restart the dev server after changing env values.
 
 If no key is provided, the app uses local fallback logic so the product remains functional.
@@ -273,7 +256,7 @@ If no key is provided, the app uses local fallback logic so the product remains 
 3. Add shared expenses and choose equal or custom split mode.
 4. Review live balances, debt summary, and settlement suggestions.
 5. Mark settlements as completed when members settle up.
-6. Use the analytics and AI sections for spending insights.
+6. Use the analytics tab for spending insights.
 
 ## Verification
 
@@ -287,24 +270,28 @@ npm run build
 
 ## Deployment
 
-The PDF requires the app to be accessible online using Vercel or Netlify.
+This project is intended to be deployed on Vercel.
 
 ### Deploy on Vercel
 
 1. Push the repository to GitHub.
 2. Import the repository into Vercel.
-3. Add `OPENAI_API_KEY` in Vercel environment variables if live AI is required.
-4. Optionally add `OPENAI_MODEL` if you want to override the default model.
-5. Deploy the project.
+3. Add these environment variables in Vercel:
+   `OPENAI_API_KEY`
+   `OPENAI_MODEL` (optional)
+4. Deploy the project.
 
-### Deploy on Netlify
+After deployment, update this README with:
 
-1. Push the repository to GitHub.
-2. Import the repository into Netlify.
-3. Configure the Next.js build settings as needed.
-4. Add `OPENAI_API_KEY` if live AI is required.
-5. Optionally add `OPENAI_MODEL` if you want to override the default model.
-6. Deploy the project.
+- your public GitHub repository link
+- your live Vercel URL
+- your demo video link
+
+### Production Notes
+
+- the app is local-first, so expense data is stored in the browser
+- different browsers/devices will not automatically share the same local data
+- OpenAI-powered features require environment variables in Vercel if you want live AI in production
 
 ## Submission Checklist
 
@@ -314,7 +301,7 @@ Before final submission, complete the remaining PDF submission steps:
 - push the latest code
 - keep this README updated
 - record a demo video under 5 minutes
-- deploy on Vercel or Netlify
+- deploy on Vercel
 - share the repository link and live deployment link
 
 ## Assumptions and Scope Notes
@@ -322,7 +309,7 @@ Before final submission, complete the remaining PDF submission steps:
 - this implementation is local-first and stores data in the browser
 - a full backend and multi-user server sync were not required by the PDF
 - AI is applied to expense workflows because that matches the Smart Expense Splitter problem statement
-- the final deployment, public repository creation, and demo video depend on your own accounts and submission process
+- the final public GitHub repository, deployed Vercel URL, and demo video depend on your own accounts
 
 ## Author Note
 
