@@ -1,19 +1,10 @@
-import {
-  Group,
-  MemberBalance,
-  Settlement,
-  GroupSummary,
-  ExpenseCategory,
-} from "@/types";
-
-// ─── Balance Calculation ──────────────────────────────────────────────────────
+import { Group, MemberBalance, Settlement } from "@/types";
 
 export function calculateBalances(group: Group): MemberBalance[] {
-  const map = new Map<string, MemberBalance>();
+  const balances = new Map<string, MemberBalance>();
 
-  // initialise every member
   for (const member of group.members) {
-    map.set(member.id, {
+    balances.set(member.id, {
       memberId: member.id,
       memberName: member.name,
       totalPaid: 0,
@@ -25,15 +16,13 @@ export function calculateBalances(group: Group): MemberBalance[] {
   }
 
   for (const expense of group.expenses) {
-    // payer gets credit
-    const payer = map.get(expense.paidBy);
+    const payer = balances.get(expense.paidBy);
     if (payer) {
       payer.totalPaid += expense.amount;
     }
 
-    // each split member owes their portion
     for (const split of expense.splits) {
-      const debtor = map.get(split.memberId);
+      const debtor = balances.get(split.memberId);
       if (debtor) {
         debtor.totalOwed += split.amount;
       }
@@ -41,19 +30,18 @@ export function calculateBalances(group: Group): MemberBalance[] {
   }
 
   for (const settlement of group.settlementsHistory) {
-    const debtor = map.get(settlement.from);
+    const debtor = balances.get(settlement.from);
     if (debtor) {
       debtor.settlementsPaid += settlement.amount;
     }
 
-    const creditor = map.get(settlement.to);
+    const creditor = balances.get(settlement.to);
     if (creditor) {
       creditor.settlementsReceived += settlement.amount;
     }
   }
 
-  // compute net balance
-  for (const balance of Array.from(map.values())) {
+  for (const balance of Array.from(balances.values())) {
     balance.netBalance =
       balance.totalPaid +
       balance.settlementsPaid -
@@ -61,31 +49,28 @@ export function calculateBalances(group: Group): MemberBalance[] {
       balance.settlementsReceived;
   }
 
-  return Array.from(map.values());
+  return Array.from(balances.values());
 }
-
-// ─── Minimum Transactions Settlement Algorithm ────────────────────────────────
 
 export function calculateSettlements(balances: MemberBalance[]): Settlement[] {
   const settlements: Settlement[] = [];
 
-  // Deep-copy so we don't mutate
   const creditors = balances
-    .filter((b) => b.netBalance > 0.005)
-    .map((b) => ({ ...b }))
+    .filter((balance) => balance.netBalance > 0.005)
+    .map((balance) => ({ ...balance }))
     .sort((a, b) => b.netBalance - a.netBalance);
 
   const debtors = balances
-    .filter((b) => b.netBalance < -0.005)
-    .map((b) => ({ ...b }))
+    .filter((balance) => balance.netBalance < -0.005)
+    .map((balance) => ({ ...balance }))
     .sort((a, b) => a.netBalance - b.netBalance);
 
-  let ci = 0;
-  let di = 0;
+  let creditorIndex = 0;
+  let debtorIndex = 0;
 
-  while (ci < creditors.length && di < debtors.length) {
-    const creditor = creditors[ci];
-    const debtor = debtors[di];
+  while (creditorIndex < creditors.length && debtorIndex < debtors.length) {
+    const creditor = creditors[creditorIndex];
+    const debtor = debtors[debtorIndex];
     const amount = Math.min(creditor.netBalance, -debtor.netBalance);
 
     if (amount > 0.005) {
@@ -101,34 +86,14 @@ export function calculateSettlements(balances: MemberBalance[]): Settlement[] {
     creditor.netBalance -= amount;
     debtor.netBalance += amount;
 
-    if (Math.abs(creditor.netBalance) < 0.005) ci++;
-    if (Math.abs(debtor.netBalance) < 0.005) di++;
+    if (Math.abs(creditor.netBalance) < 0.005) {
+      creditorIndex += 1;
+    }
+
+    if (Math.abs(debtor.netBalance) < 0.005) {
+      debtorIndex += 1;
+    }
   }
 
   return settlements;
-}
-
-// ─── Category Breakdown ───────────────────────────────────────────────────────
-
-export function getCategoryBreakdown(
-  group: Group
-): { category: ExpenseCategory; amount: number }[] {
-  const map = new Map<ExpenseCategory, number>();
-  for (const expense of group.expenses) {
-    map.set(expense.category, (map.get(expense.category) ?? 0) + expense.amount);
-  }
-  return Array.from(map.entries())
-    .map(([category, amount]) => ({ category, amount }))
-    .sort((a, b) => b.amount - a.amount);
-}
-
-// ─── Full Group Summary ───────────────────────────────────────────────────────
-
-export function getGroupSummary(group: Group): GroupSummary {
-  const balances = calculateBalances(group);
-  const settlements = calculateSettlements(balances);
-  const categoryBreakdown = getCategoryBreakdown(group);
-  const totalExpenses = group.expenses.reduce((sum, e) => sum + e.amount, 0);
-
-  return { group, balances, settlements, totalExpenses, categoryBreakdown };
 }

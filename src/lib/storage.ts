@@ -29,10 +29,6 @@ export function saveGroups(groups: Group[]): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(groups.map(normalizeGroup)));
 }
 
-export function getGroupById(id: string): Group | undefined {
-  return getGroups().find((g) => g.id === id);
-}
-
 export function upsertGroup(group: Group): void {
   const groups = getGroups();
   const idx = groups.findIndex((g) => g.id === group.id);

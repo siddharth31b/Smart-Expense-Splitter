@@ -51,7 +51,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate splits sum
     const splitsTotal = splits.reduce((sum, s) => sum + s.amount, 0);
     if (Math.abs(splitsTotal - amount) > 0.01) {
       return NextResponse.json(

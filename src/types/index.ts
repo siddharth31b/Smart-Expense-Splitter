@@ -1,10 +1,7 @@
-// ─── Core Domain Types ───────────────────────────────────────────────────────
-
 export interface Member {
   id: string;
   name: string;
   email?: string;
-  avatar?: string; // initials-based color
 }
 
 export type ExpenseCategory =
@@ -21,7 +18,7 @@ export type SplitType = "equal" | "custom";
 
 export interface ExpenseSplit {
   memberId: string;
-  amount: number; // exact amount this member owes
+  amount: number;
 }
 
 export interface Expense {
@@ -31,10 +28,10 @@ export interface Expense {
   amount: number;
   currency: string;
   category: ExpenseCategory;
-  paidBy: string; // memberId
+  paidBy: string;
   splitType: SplitType;
   splits: ExpenseSplit[];
-  date: string; // ISO
+  date: string;
   createdAt: string;
   aiCategorized?: boolean;
 }
@@ -61,8 +58,6 @@ export interface Group {
   updatedAt: string;
 }
 
-// ─── Derived / Computed Types ─────────────────────────────────────────────────
-
 export interface MemberBalance {
   memberId: string;
   memberName: string;
@@ -70,34 +65,18 @@ export interface MemberBalance {
   totalOwed: number;
   settlementsPaid: number;
   settlementsReceived: number;
-  netBalance: number; // positive = is owed money, negative = owes money
+  netBalance: number;
 }
 
 export interface Settlement {
-  from: string; // memberId
+  from: string;
   fromName: string;
-  to: string; // memberId
+  to: string;
   toName: string;
   amount: number;
 }
 
-export interface GroupSummary {
-  group: Group;
-  balances: MemberBalance[];
-  settlements: Settlement[];
-  totalExpenses: number;
-  categoryBreakdown: { category: ExpenseCategory; amount: number }[];
-}
-
-// ─── AI Types ─────────────────────────────────────────────────────────────────
-
 export interface AIInsight {
   type: "warning" | "info" | "tip";
   message: string;
-}
-
-export interface AIAnalysis {
-  insights: AIInsight[];
-  topCategory: ExpenseCategory;
-  categoryBreakdown: { category: ExpenseCategory; amount: number; percentage: number }[];
 }

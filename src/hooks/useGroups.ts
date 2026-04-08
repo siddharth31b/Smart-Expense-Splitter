@@ -83,11 +83,6 @@ export function useGroups() {
     [updateGroup]
   );
 
-  const getGroup = useCallback(
-    (id: string) => groups.find((g) => g.id === id),
-    [groups]
-  );
-
   return {
     groups,
     addGroup,
@@ -96,6 +91,5 @@ export function useGroups() {
     removeExpense,
     addMember,
     recordSettlement,
-    getGroup,
   };
 }
