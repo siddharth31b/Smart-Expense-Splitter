@@ -2,7 +2,7 @@
 
 Assignment implementation for NeevAI SuperCloud Pvt. Ltd.
 
-Smart Expense Splitter is a lightweight group expense management web app built with Next.js 14, TypeScript, and Tailwind CSS. It helps users create groups, add members, record shared expenses, split costs equally or with custom amounts, track balances in real time, and view clear settlement suggestions. Optional AI enhancements are included for expense categorization and spending insights, with local fallbacks so the product remains usable without an external API key.
+Smart Expense Splitter is a lightweight group expense management web app built with Next.js 14, TypeScript, and Tailwind CSS. It lets users create groups, add members, record shared expenses, split costs equally or with custom amounts, track balances in real time, and view clear settlement suggestions. Optional AI enhancements are included for expense categorization and spending insights, with local fallbacks so the product remains usable even without an API key.
 
 ## Assignment Overview
 
@@ -22,18 +22,18 @@ Good-to-have AI features in the PDF:
 Submission requirements mentioned in the PDF:
 
 1. Create a public GitHub repository.
-2. Push code and update the README with setup instructions, architecture details, and feature implementation.
+2. Push the code and update the README with setup instructions, architecture details, and feature implementation.
 3. Record a demo video under 5 minutes.
 4. Deploy the app on Vercel or Netlify.
 
 ## Solution Summary
 
-This repository implements the Smart Expense Splitter problem statement in a local-first architecture optimized for speed, simplicity, and smooth UX.
+This repository implements the Smart Expense Splitter problem statement in a local-first architecture optimized for speed, clarity, and smooth UX.
 
-Implemented product outcomes:
+Implemented outcomes:
 
 - group creation with validation
-- member management during creation and after creation
+- member management during and after group creation
 - equal split and custom split expenses
 - automatic balance calculation
 - debt summary and settlement suggestions
@@ -66,7 +66,7 @@ Current submission status:
 - equal split mode distributes the amount across all members
 - custom split mode allows exact per-member allocations
 - custom split values are validated against the total amount
-- expense history supports sorting and filtering for easier review
+- expense history supports sorting and filtering
 
 ### 3. Balances and Settlements
 
@@ -78,17 +78,17 @@ Current submission status:
 ### 4. Analytics and AI
 
 - spending charts show category distribution and recent daily spending
-- AI categorization can infer categories from expense descriptions
+- AI categorization suggests categories from expense descriptions
 - AI insights summarize spending behavior and unusual patterns
 - if no API key is present, local fallback logic keeps AI-related UX functional
 
 ### 5. UX and UI
 
-- responsive layout for desktop and mobile
+- responsive layout for mobile, tablet, and laptop screens
 - clear modal-based flows for creating groups, adding members, and adding expenses
-- consistent reusable UI primitives
+- reusable UI primitives for consistency
 - readable balance and settlement presentation
-- improved member display using full-name chips instead of ambiguous initials
+- full-name member chips instead of ambiguous initials
 
 ## Evaluation Criteria Mapping
 
@@ -98,15 +98,23 @@ The core assignment requirements from the PDF are implemented, along with option
 
 ### Code Quality and Scalability
 
-The codebase is modular and separated by route, feature, shared business logic, and types. Reusable utilities and UI primitives are centralized to avoid duplication.
+The codebase is modular and separated by route, feature, shared business logic, and types. Reusable utilities and UI primitives are centralized to reduce duplication.
+
+### Real-Time Performance
+
+The app uses a local-first flow with instant UI updates and `localStorage` persistence. Cross-tab synchronization is supported through the browser `storage` event.
+
+### AI Accuracy
+
+AI is applied to the Smart Expense Splitter use case from the PDF: expense categorization and spending insights. If a live API key is unavailable, the app falls back to deterministic local logic instead of breaking the workflow.
 
 ### UX and UI
 
-The interface is designed to be lightweight, fast, and easy to understand during common group-expense workflows.
+The interface is designed to be lightweight, responsive, and easy to use during common group-expense workflows.
 
 ### Bonus Points
 
-Additional improvements include settlement history persistence, reusable member chips, fallback AI mode, sorting and filtering support, and a cleaner assignment-ready documentation structure.
+Additional improvements include settlement history persistence, reusable member chips, AI fallback mode, responsive layout polish, and cleaner assignment-ready documentation.
 
 ## Tech Stack
 
@@ -135,7 +143,7 @@ Additional improvements include settlement history persistence, reusable member 
 ### Business Logic
 
 - `src/lib/calculations.ts` handles balance and settlement calculations
-- `src/lib/utils.ts` contains shared UI and formatting helpers
+- `src/lib/utils.ts` contains shared formatting and UI helpers
 - domain types are centralized in `src/types/index.ts`
 
 ### API Layer
@@ -188,6 +196,7 @@ smart-expense-splitter/
 │  │  └─ utils.ts
 │  └─ types/
 │     └─ index.ts
+├─ .env.example
 ├─ package.json
 ├─ tailwind.config.js
 ├─ tsconfig.json
@@ -217,12 +226,19 @@ npm install
 
 ### 2. Configure Environment Variables
 
-Create a `.env.local` file in the project root.
+Use the included `.env.example` file as a template. It documents which environment variables the project expects.
+
+Create `.env.local` in the project root and add your real values:
 
 ```env
-OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_API_KEY=your_real_openai_api_key
 OPENAI_MODEL=gpt-4.1-mini
 ```
+
+Environment file roles:
+
+- `.env.local`: your real local secrets, never commit this file
+- `.env.example`: safe sample file for setup reference and deployment guidance
 
 If `OPENAI_API_KEY` is not set, the app still works using local fallback logic for categorization and insights.
 
@@ -233,6 +249,22 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+## AI Setup
+
+The app can use OpenAI for two AI-assisted flows:
+
+- expense categorization from the expense description
+- spending insights on the analytics tab
+
+To enable live AI:
+
+1. Create an OpenAI API key in your OpenAI dashboard.
+2. Put the key in `.env.local` as `OPENAI_API_KEY`.
+3. Optionally set `OPENAI_MODEL` if you want to change the default model.
+4. Restart the dev server after changing env values.
+
+If no key is provided, the app uses local fallback logic so the product remains functional.
 
 ## Usage Flow
 
