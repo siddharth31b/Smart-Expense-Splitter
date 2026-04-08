@@ -1,7 +1,7 @@
 "use client";
+
 import { Settlement, SettlementRecord } from "@/types";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { Avatar } from "@/components/ui/Avatar";
 import { ArrowRight, CheckCircle2, PartyPopper } from "lucide-react";
 
 interface Props {
@@ -14,9 +14,11 @@ export function SettlementList({ settlements, history = [], onSettle }: Props) {
   if (settlements.length === 0 && history.length === 0) {
     return (
       <div className="glass-card p-8 text-center">
-        <PartyPopper size={28} className="mx-auto text-emerald-400 mb-2" />
-        <p className="text-emerald-400 font-semibold">All settled up!</p>
-        <p className="text-slate-500 text-sm mt-1">No outstanding balances in this group.</p>
+        <PartyPopper size={28} className="mx-auto mb-2 text-emerald-400" />
+        <p className="font-semibold text-emerald-400">All settled up!</p>
+        <p className="mt-1 text-sm text-slate-500">
+          No outstanding balances in this group.
+        </p>
       </div>
     );
   }
@@ -24,35 +26,41 @@ export function SettlementList({ settlements, history = [], onSettle }: Props) {
   return (
     <div className="space-y-4">
       <div className="glass-card p-5">
-        <h3 className="font-semibold text-white mb-4">Suggested Settlements</h3>
+        <h3 className="mb-4 font-semibold text-white">Suggested Settlements</h3>
         {settlements.length === 0 ? (
           <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-300">
             Outstanding balances are currently settled.
           </div>
         ) : (
           <div className="space-y-3">
-            {settlements.map((s, i) => (
+            {settlements.map((settlement, index) => (
               <div
-                key={i}
+                key={index}
                 className="flex items-center gap-3 rounded-xl border border-surface-border bg-white/[0.03] p-3"
               >
-                <Avatar name={s.fromName} size="md" />
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-white truncate">{s.fromName}</span>
-                    <ArrowRight size={13} className="text-slate-500 flex-shrink-0" />
-                    <span className="text-sm font-medium text-white truncate">{s.toName}</span>
+                    <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-300">
+                      {settlement.fromName}
+                    </span>
+                    <ArrowRight size={13} className="flex-shrink-0 text-slate-500" />
+                    <span className="rounded-full border border-sky-500/20 bg-sky-500/10 px-2.5 py-1 text-xs font-medium text-sky-300">
+                      {settlement.toName}
+                    </span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-0.5">Payment to settle debt</p>
+                  <p className="mt-1 text-xs text-slate-500">Payment to settle debt</p>
                 </div>
-                <Avatar name={s.toName} size="md" />
-                <div className="text-right flex-shrink-0 ml-2">
-                  <p className="font-bold text-amber-400">{formatCurrency(s.amount)}</p>
+
+                <div className="ml-2 flex-shrink-0 text-right">
+                  <p className="font-bold text-amber-400">
+                    {formatCurrency(settlement.amount)}
+                  </p>
                 </div>
+
                 {onSettle && (
                   <button
-                    onClick={() => onSettle(s)}
-                    className="ml-2 p-2 rounded-lg hover:bg-emerald-500/10 text-slate-500 hover:text-emerald-400 transition-all flex-shrink-0"
+                    onClick={() => onSettle(settlement)}
+                    className="ml-2 flex-shrink-0 rounded-lg p-2 text-slate-500 transition-all hover:bg-emerald-500/10 hover:text-emerald-400"
                     title="Mark as settled"
                   >
                     <CheckCircle2 size={16} />

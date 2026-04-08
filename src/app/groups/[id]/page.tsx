@@ -20,7 +20,6 @@ import { BalanceCard } from "@/components/settlements/BalanceCard";
 import { SettlementList } from "@/components/settlements/SettlementList";
 import { SpendingChart } from "@/components/dashboard/SpendingChart";
 import { AIInsightsPanel } from "@/components/dashboard/AIInsightsPanel";
-import { Avatar } from "@/components/ui/Avatar";
 import { useGroups } from "@/hooks/useGroups";
 import { calculateBalances, calculateSettlements } from "@/lib/calculations";
 import { formatCurrency, formatDate } from "@/lib/utils";
@@ -35,13 +34,8 @@ interface PageProps {
 export default function GroupPage({ params }: PageProps) {
   const { id } = params;
   const router = useRouter();
-  const {
-    groups,
-    addExpense,
-    removeExpense,
-    addMember,
-    recordSettlement,
-  } = useGroups();
+  const { groups, addExpense, removeExpense, addMember, recordSettlement } =
+    useGroups();
 
   const [activeTab, setActiveTab] = useState<Tab>("expenses");
   const [showAddExpense, setShowAddExpense] = useState(false);
@@ -147,9 +141,14 @@ export default function GroupPage({ params }: PageProps) {
                 )}
 
                 <div className="mt-3 flex items-center gap-3 flex-wrap">
-                  <div className="flex -space-x-2">
-                    {group.members.slice(0, 6).map((member) => (
-                      <Avatar key={member.id} name={member.name} size="sm" />
+                  <div className="flex flex-wrap gap-2">
+                    {group.members.map((member) => (
+                      <span
+                        key={member.id}
+                        className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300"
+                      >
+                        {member.name}
+                      </span>
                     ))}
                   </div>
                   <span className="text-xs text-slate-500">

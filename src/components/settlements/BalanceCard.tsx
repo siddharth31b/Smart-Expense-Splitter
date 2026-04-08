@@ -1,7 +1,7 @@
 "use client";
+
 import { MemberBalance } from "@/types";
 import { formatCurrency } from "@/lib/utils";
-import { Avatar } from "@/components/ui/Avatar";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 
 interface Props {
@@ -11,27 +11,33 @@ interface Props {
 export function BalanceCard({ balances }: Props) {
   return (
     <div className="glass-card p-5">
-      <h3 className="font-semibold text-white mb-4">Member Balances</h3>
+      <h3 className="mb-4 font-semibold text-white">Member Balances</h3>
       <div className="space-y-3">
-        {balances.map((b) => {
-          const isPositive = b.netBalance > 0.01;
-          const isNegative = b.netBalance < -0.01;
+        {balances.map((balance) => {
+          const isPositive = balance.netBalance > 0.01;
+          const isNegative = balance.netBalance < -0.01;
+
           return (
-            <div key={b.memberId} className="flex items-center gap-3">
-              <Avatar name={b.memberName} size="md" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">{b.memberName}</p>
+            <div key={balance.memberId} className="flex items-center gap-3">
+              <div className="min-w-0 flex-1">
+                <div className="mb-1">
+                  <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-300">
+                    {balance.memberName}
+                  </span>
+                </div>
                 <p className="text-xs text-slate-500">
-                  Paid {formatCurrency(b.totalPaid)} · Owed {formatCurrency(b.totalOwed)}
+                  Paid {formatCurrency(balance.totalPaid)} · Owed{" "}
+                  {formatCurrency(balance.totalOwed)}
                 </p>
-                {(b.settlementsPaid > 0 || b.settlementsReceived > 0) && (
+                {(balance.settlementsPaid > 0 || balance.settlementsReceived > 0) && (
                   <p className="text-xs text-slate-600">
-                    Settled {formatCurrency(b.settlementsPaid)} out · Received{" "}
-                    {formatCurrency(b.settlementsReceived)}
+                    Settled {formatCurrency(balance.settlementsPaid)} out · Received{" "}
+                    {formatCurrency(balance.settlementsReceived)}
                   </p>
                 )}
               </div>
-              <div className="text-right flex-shrink-0 flex items-center gap-2">
+
+              <div className="flex flex-shrink-0 items-center gap-2 text-right">
                 {isPositive ? (
                   <TrendingUp size={14} className="text-emerald-400" />
                 ) : isNegative ? (
@@ -45,12 +51,12 @@ export function BalanceCard({ balances }: Props) {
                       isPositive
                         ? "text-emerald-400"
                         : isNegative
-                        ? "text-red-400"
-                        : "text-slate-500"
+                          ? "text-red-400"
+                          : "text-slate-500"
                     }`}
                   >
                     {isPositive ? "+" : ""}
-                    {formatCurrency(b.netBalance)}
+                    {formatCurrency(balance.netBalance)}
                   </p>
                   <p className="text-xs text-slate-500">
                     {isPositive ? "gets back" : isNegative ? "owes" : "settled"}

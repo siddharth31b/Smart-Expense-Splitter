@@ -1,8 +1,8 @@
 "use client";
+
 import { useState } from "react";
 import { Expense, Member } from "@/types";
 import { CATEGORY_META, formatCurrency, formatDate } from "@/lib/utils";
-import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Sparkles, Trash2, Receipt, SlidersHorizontal } from "lucide-react";
 
@@ -13,10 +13,13 @@ interface Props {
 }
 
 export function ExpenseList({ expenses, members, onDelete }: Props) {
-  const [sortBy, setSortBy] = useState<"recent" | "oldest" | "highest" | "lowest">("recent");
+  const [sortBy, setSortBy] = useState<"recent" | "oldest" | "highest" | "lowest">(
+    "recent"
+  );
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const memberMap = Object.fromEntries(members.map((m) => [m.id, m]));
+  const memberMap = Object.fromEntries(members.map((member) => [member.id, member]));
+
   const visibleExpenses = [...expenses]
     .filter((expense) => {
       const expenseDate = expense.date.slice(0, 10);
@@ -43,9 +46,11 @@ export function ExpenseList({ expenses, members, onDelete }: Props) {
   if (expenses.length === 0) {
     return (
       <div className="glass-card p-10 text-center">
-        <Receipt size={32} className="mx-auto text-slate-600 mb-3" />
-        <p className="text-slate-400 font-medium">No expenses yet</p>
-        <p className="text-slate-600 text-sm mt-1">Add your first expense to get started</p>
+        <Receipt size={32} className="mx-auto mb-3 text-slate-600" />
+        <p className="font-medium text-slate-400">No expenses yet</p>
+        <p className="mt-1 text-sm text-slate-600">
+          Add your first expense to get started
+        </p>
       </div>
     );
   }
@@ -138,41 +143,44 @@ export function ExpenseList({ expenses, members, onDelete }: Props) {
         return (
           <div
             key={expense.id}
-            className="glass-card p-4 flex items-center gap-4 hover:border-slate-600/50 transition-all group/item"
+            className="glass-card group/item flex items-center gap-4 p-4 transition-all hover:border-slate-600/50"
           >
-            {/* Category icon */}
-            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-xl flex-shrink-0">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 text-xl">
               {meta.emoji}
             </div>
 
-            {/* Details */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-medium text-white text-sm truncate">{expense.description}</span>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="truncate text-sm font-medium text-white">
+                  {expense.description}
+                </span>
                 {expense.aiCategorized && (
-                  <Sparkles size={12} className="text-emerald-400 flex-shrink-0" />
+                  <Sparkles size={12} className="flex-shrink-0 text-emerald-400" />
                 )}
                 <Badge variant="muted">{meta.label}</Badge>
               </div>
-              <div className="flex items-center gap-2 mt-1">
-                {payer && <Avatar name={payer.name} size="sm" />}
+
+              <div className="mt-1 flex items-center gap-2">
+                {payer && (
+                  <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-300">
+                    {payer.name}
+                  </span>
+                )}
                 <span className="text-xs text-slate-500">
-                  {payer?.name ?? "Unknown"} paid · {formatDate(expense.date)} ·{" "}
+                  {(payer?.name ?? "Unknown")} paid · {formatDate(expense.date)} ·{" "}
                   {expense.splitType === "equal" ? "Split equally" : "Custom split"}
                 </span>
               </div>
             </div>
 
-            {/* Amount */}
-            <div className="text-right flex-shrink-0">
+            <div className="flex-shrink-0 text-right">
               <p className="font-bold text-white">{formatCurrency(expense.amount)}</p>
               <p className="text-xs text-slate-500">{splitSummary}</p>
             </div>
 
-            {/* Delete */}
             <button
               onClick={() => onDelete(expense.id)}
-              className="p-2 opacity-0 group-hover/item:opacity-100 hover:bg-red-500/20 text-slate-500 hover:text-red-400 rounded-lg transition-all flex-shrink-0"
+              className="flex-shrink-0 rounded-lg p-2 text-slate-500 opacity-0 transition-all group-hover/item:opacity-100 hover:bg-red-500/20 hover:text-red-400"
             >
               <Trash2 size={14} />
             </button>
