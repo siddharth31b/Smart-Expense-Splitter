@@ -62,7 +62,7 @@ export function AIInsightsPanel({ expenses }: Props) {
 
   return (
     <div className="glass-card p-5">
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <Sparkles size={16} className="text-emerald-400" />
           <h3 className="font-semibold text-white">AI Spending Insights</h3>
@@ -72,7 +72,7 @@ export function AIInsightsPanel({ expenses }: Props) {
           <button
             onClick={fetchInsights}
             disabled={loading || expenses.length === 0}
-            className="flex items-center gap-1.5 rounded-lg border border-emerald-500/30 px-3 py-1.5 text-xs text-emerald-400 transition-all hover:bg-emerald-500/10 hover:text-emerald-300 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-emerald-500/30 px-3 py-1.5 text-xs text-emerald-400 transition-all hover:bg-emerald-500/10 hover:text-emerald-300 disabled:opacity-50 sm:w-auto"
           >
             {loading ? (
               <>
@@ -94,7 +94,7 @@ export function AIInsightsPanel({ expenses }: Props) {
               fetchInsights();
             }}
             disabled={loading}
-            className="text-xs text-slate-400 transition-colors hover:text-white"
+            className="text-left text-xs text-slate-400 transition-colors hover:text-white sm:text-right"
           >
             Refresh
           </button>
@@ -103,7 +103,8 @@ export function AIInsightsPanel({ expenses }: Props) {
 
       {!fetched && !loading && (
         <p className="text-sm text-slate-500">
-          Click &quot;Analyze&quot; to get AI-powered insights about your spending patterns.
+          Click &quot;Analyze&quot; to get AI-powered insights about your spending
+          patterns.
         </p>
       )}
 

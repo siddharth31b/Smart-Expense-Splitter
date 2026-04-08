@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Expense, Member } from "@/types";
 import { CATEGORY_META, formatCurrency, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
-import { Sparkles, Trash2, Receipt, SlidersHorizontal } from "lucide-react";
+import { Receipt, SlidersHorizontal, Sparkles, Trash2 } from "lucide-react";
 
 interface Props {
   expenses: Expense[];
@@ -58,7 +58,7 @@ export function ExpenseList({ expenses, members, onDelete }: Props) {
   return (
     <div className="space-y-4">
       <div className="glass-card p-4">
-        <div className="mb-3 flex items-center gap-2">
+        <div className="mb-3 flex flex-wrap items-center gap-2">
           <SlidersHorizontal size={14} className="text-emerald-400" />
           <h3 className="text-sm font-semibold text-white">Expense History</h3>
           <span className="text-xs text-slate-500">
@@ -66,7 +66,7 @@ export function ExpenseList({ expenses, members, onDelete }: Props) {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,1fr)_180px]">
           <div>
             <label className="mb-1.5 block text-xs font-medium text-slate-400">Sort</label>
             <select
@@ -89,7 +89,7 @@ export function ExpenseList({ expenses, members, onDelete }: Props) {
           <div>
             <label className="mb-1.5 block text-xs font-medium text-slate-400">From</label>
             <input
-              className="input-dark"
+              className="input-dark min-w-0"
               type="date"
               value={fromDate}
               onChange={(event) => setFromDate(event.target.value)}
@@ -100,7 +100,7 @@ export function ExpenseList({ expenses, members, onDelete }: Props) {
           <div>
             <label className="mb-1.5 block text-xs font-medium text-slate-400">To</label>
             <input
-              className="input-dark"
+              className="input-dark min-w-0"
               type="date"
               value={toDate}
               onChange={(event) => setToDate(event.target.value)}
@@ -108,14 +108,14 @@ export function ExpenseList({ expenses, members, onDelete }: Props) {
             />
           </div>
 
-          <div className="flex items-end">
+          <div className="flex items-end xl:justify-end">
             <button
               onClick={() => {
                 setSortBy("recent");
                 setFromDate("");
                 setToDate("");
               }}
-              className="w-full rounded-xl border border-surface-border py-2.5 text-sm font-medium text-slate-400 transition-colors hover:text-white"
+              className="w-full rounded-xl border border-surface-border px-4 py-2.5 text-sm font-medium text-slate-400 transition-colors hover:text-white xl:w-auto"
             >
               Reset Filters
             </button>
@@ -143,13 +143,13 @@ export function ExpenseList({ expenses, members, onDelete }: Props) {
         return (
           <div
             key={expense.id}
-            className="glass-card group/item flex items-center gap-4 p-4 transition-all hover:border-slate-600/50"
+            className="glass-card group/item flex flex-col gap-4 p-4 transition-all hover:border-slate-600/50 sm:flex-row sm:items-center"
           >
             <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 text-xl">
               {meta.emoji}
             </div>
 
-            <div className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1 self-stretch">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="truncate text-sm font-medium text-white">
                   {expense.description}
@@ -160,22 +160,22 @@ export function ExpenseList({ expenses, members, onDelete }: Props) {
                 <Badge variant="muted">{meta.label}</Badge>
               </div>
 
-              <div className="mt-1 flex items-center gap-2">
+              <div className="mt-1 flex flex-wrap items-center gap-2">
                 <span className="text-xs text-slate-500">
-                  {(payer?.name ?? "Unknown")} paid · {formatDate(expense.date)} ·{" "}
+                  {(payer?.name ?? "Unknown")} paid - {formatDate(expense.date)} -{" "}
                   {expense.splitType === "equal" ? "Split equally" : "Custom split"}
                 </span>
               </div>
             </div>
 
-            <div className="flex-shrink-0 text-right">
+            <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:flex-col sm:items-end sm:text-right">
               <p className="font-bold text-white">{formatCurrency(expense.amount)}</p>
               <p className="text-xs text-slate-500">{splitSummary}</p>
             </div>
 
             <button
               onClick={() => onDelete(expense.id)}
-              className="flex-shrink-0 rounded-lg p-2 text-slate-500 opacity-0 transition-all group-hover/item:opacity-100 hover:bg-red-500/20 hover:text-red-400"
+              className="self-end rounded-lg p-2 text-slate-500 opacity-100 transition-all hover:bg-red-500/20 hover:text-red-400 sm:self-auto sm:opacity-0 sm:group-hover/item:opacity-100"
             >
               <Trash2 size={14} />
             </button>

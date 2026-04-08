@@ -88,7 +88,7 @@ export function CreateGroupModal({ open, onClose, onCreated }: Props) {
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="Create New Group" size="md">
+    <Modal open={open} onClose={onClose} title="Create New Group" size="lg">
       <div className="space-y-4">
         <div>
           <label className="mb-1.5 block text-xs font-medium text-slate-400">
@@ -115,7 +115,7 @@ export function CreateGroupModal({ open, onClose, onCreated }: Props) {
         </div>
 
         <div>
-          <div className="mb-2 flex items-center justify-between">
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
             <label className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
               <Users size={13} />
               Members *
@@ -131,27 +131,32 @@ export function CreateGroupModal({ open, onClose, onCreated }: Props) {
 
           <div className="space-y-2">
             {members.map((member, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <input
-                  className="input-dark"
-                  placeholder={`Member ${index + 1} name`}
-                  value={member.name}
-                  onChange={(event) => updateMember(index, "name", event.target.value)}
-                />
-                <input
-                  className="input-dark"
-                  placeholder="Email (optional)"
-                  value={member.email}
-                  onChange={(event) => updateMember(index, "email", event.target.value)}
-                />
-                {members.length > 1 && (
-                  <button
-                    onClick={() => removeMember(index)}
-                    className="flex-shrink-0 p-2 text-slate-500 transition-colors hover:text-red-400"
-                  >
-                    <Trash2 size={15} />
-                  </button>
-                )}
+              <div
+                key={index}
+                className="rounded-2xl border border-surface-border bg-surface/50 p-3"
+              >
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-center">
+                  <input
+                    className="input-dark"
+                    placeholder={`Member ${index + 1} name`}
+                    value={member.name}
+                    onChange={(event) => updateMember(index, "name", event.target.value)}
+                  />
+                  <input
+                    className="input-dark"
+                    placeholder="Email (optional)"
+                    value={member.email}
+                    onChange={(event) => updateMember(index, "email", event.target.value)}
+                  />
+                  {members.length > 1 && (
+                    <button
+                      onClick={() => removeMember(index)}
+                      className="flex h-10 items-center justify-center rounded-xl border border-surface-border px-3 text-slate-500 transition-colors hover:text-red-400"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -163,7 +168,7 @@ export function CreateGroupModal({ open, onClose, onCreated }: Props) {
           </p>
         )}
 
-        <div className="flex gap-3 pt-2">
+        <div className="flex flex-col gap-3 pt-2 sm:flex-row">
           <button
             onClick={onClose}
             className="flex-1 rounded-xl border border-surface-border py-2.5 text-sm font-medium text-slate-400 transition-colors hover:border-slate-500 hover:text-white"

@@ -1,6 +1,6 @@
 "use client";
 
-import { TrendingDown, TrendingUp, Minus } from "lucide-react";
+import { Minus, TrendingDown, TrendingUp } from "lucide-react";
 import { MemberBalance } from "@/types";
 import { formatCurrency } from "@/lib/utils";
 import { MemberChip } from "@/components/ui/MemberChip";
@@ -19,24 +19,27 @@ export function BalanceCard({ balances }: Props) {
           const isNegative = balance.netBalance < -0.01;
 
           return (
-            <div key={balance.memberId} className="flex items-center gap-3">
+            <div
+              key={balance.memberId}
+              className="flex flex-col gap-3 rounded-2xl border border-surface-border bg-white/[0.03] p-3 sm:flex-row sm:items-center"
+            >
               <div className="min-w-0 flex-1">
                 <div className="mb-1">
                   <MemberChip name={balance.memberName} />
                 </div>
                 <p className="text-xs text-slate-500">
-                  Paid {formatCurrency(balance.totalPaid)} · Owed{" "}
+                  Paid {formatCurrency(balance.totalPaid)} • Owed{" "}
                   {formatCurrency(balance.totalOwed)}
                 </p>
                 {(balance.settlementsPaid > 0 || balance.settlementsReceived > 0) && (
                   <p className="text-xs text-slate-600">
-                    Settled {formatCurrency(balance.settlementsPaid)} out · Received{" "}
+                    Settled {formatCurrency(balance.settlementsPaid)} out • Received{" "}
                     {formatCurrency(balance.settlementsReceived)}
                   </p>
                 )}
               </div>
 
-              <div className="flex flex-shrink-0 items-center gap-2 text-right">
+              <div className="flex items-center gap-2 self-start text-left sm:self-auto sm:text-right">
                 {isPositive ? (
                   <TrendingUp size={14} className="text-emerald-400" />
                 ) : isNegative ? (

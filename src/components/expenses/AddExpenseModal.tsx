@@ -170,7 +170,7 @@ export function AddExpenseModal({ open, onClose, group, onAdded }: Props) {
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="Add Expense" size="md">
+    <Modal open={open} onClose={onClose} title="Add Expense" size="lg">
       <div className="space-y-4">
         <div>
           <label className="mb-1.5 block text-xs font-medium text-slate-400">
@@ -197,7 +197,7 @@ export function AddExpenseModal({ open, onClose, group, onAdded }: Props) {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
             <label className="mb-1.5 block text-xs font-medium text-slate-400">
               Amount (INR) *
@@ -231,7 +231,7 @@ export function AddExpenseModal({ open, onClose, group, onAdded }: Props) {
 
         <div>
           <label className="mb-1.5 block text-xs font-medium text-slate-400">Category</label>
-          <div className="grid grid-cols-4 gap-1.5">
+          <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
             {ALL_CATEGORIES.map((currentCategory) => {
               const meta = CATEGORY_META[currentCategory];
               return (
@@ -273,7 +273,7 @@ export function AddExpenseModal({ open, onClose, group, onAdded }: Props) {
 
         <div>
           <label className="mb-2 block text-xs font-medium text-slate-400">Split</label>
-          <div className="mb-3 flex gap-2">
+          <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
             {(["equal", "custom"] as SplitType[]).map((type) => (
               <button
                 key={type}
@@ -296,8 +296,11 @@ export function AddExpenseModal({ open, onClose, group, onAdded }: Props) {
                 {(parseFloat(amount) || 0).toFixed(2)}
               </div>
               {group.members.map((member) => (
-                <div key={member.id} className="flex items-center gap-3">
-                  <span className="w-28 truncate text-sm text-slate-300">
+                <div
+                  key={member.id}
+                  className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3"
+                >
+                  <span className="text-sm text-slate-300 sm:w-28 sm:truncate">
                     {member.name}
                   </span>
                   <input
@@ -326,7 +329,7 @@ export function AddExpenseModal({ open, onClose, group, onAdded }: Props) {
           </p>
         )}
 
-        <div className="flex gap-3 pt-1">
+        <div className="flex flex-col gap-3 pt-1 sm:flex-row">
           <button
             onClick={onClose}
             className="flex-1 rounded-xl border border-surface-border py-2.5 text-sm font-medium text-slate-400 transition-colors hover:text-white"

@@ -1,235 +1,251 @@
 # Smart Expense Splitter
 
-Professional assignment implementation for NeevAI SuperCloud Pvt. Ltd.
+Assignment implementation for NeevAI SuperCloud Pvt. Ltd.
 
-This project is a lightweight expense-splitting web application built with Next.js 14, TypeScript, and Tailwind CSS. It helps users create groups, add members, record shared expenses, split them equally or with custom shares, calculate live balances, and settle debts with a clean local-first UX. Optional AI helpers are included for expense categorization and spending insights, with graceful local fallbacks when an API key is not configured.
+Smart Expense Splitter is a lightweight group expense management web app built with Next.js 14, TypeScript, and Tailwind CSS. It helps users create groups, add members, record shared expenses, split costs equally or with custom amounts, track balances in real time, and view clear settlement suggestions. Optional AI enhancements are included for expense categorization and spending insights, with local fallbacks so the product remains usable without an external API key.
 
-## Problem Statement Coverage
+## Assignment Overview
 
-The shared PDF asked for a Smart Expense Splitter that should:
+The shared PDF asks for a web application that:
 
-- create groups and add members
-- add and split shared expenses equally or custom
-- calculate balances automatically
-- clearly show who owes whom
-- provide a debt and settlement summary
-- be deployable on Vercel or Netlify
+- enables users to create groups and add members
+- allows adding and splitting expenses equally or with custom shares
+- calculates and displays balances automatically
+- provides a clear debt and settlement summary
+- is deployed and accessible online through Vercel or Netlify
 
-This codebase implements all of the product requirements inside the PDF. The only step that still depends on your own accounts is final public deployment and GitHub submission.
+Good-to-have AI features in the PDF:
 
-## Evaluation Criteria Mapping
+- smart expense categorization
+- spending insights and analytics
 
-### 1. Feature Completion
+Submission requirements mentioned in the PDF:
 
-Implemented:
+1. Create a public GitHub repository.
+2. Push code and update the README with setup instructions, architecture details, and feature implementation.
+3. Record a demo video under 5 minutes.
+4. Deploy the app on Vercel or Netlify.
+
+## Solution Summary
+
+This repository implements the Smart Expense Splitter problem statement in a local-first architecture optimized for speed, simplicity, and smooth UX.
+
+Implemented product outcomes:
 
 - group creation with validation
-- member creation during group setup
-- member addition after group creation
-- equal split expenses
-- custom split expenses
+- member management during creation and after creation
+- equal split and custom split expenses
 - automatic balance calculation
-- suggested settlements
-- settlement history persistence
-- expense analytics dashboard
-- AI categorization
-- AI spending insights
+- debt summary and settlement suggestions
+- settlement history tracking
+- analytics dashboard with category and daily spending charts
+- optional AI expense categorization
+- optional AI-powered spending insights
 
-### 2. Code Quality and Scalability
+Current submission status:
 
-Implemented:
+- application code: complete
+- README and architecture documentation: complete
+- deployment readiness: complete
+- public GitHub repo: to be completed from your account
+- demo video: to be completed by you
+- final hosted link: to be completed from your account
 
-- modular separation across `app`, `components`, `hooks`, `lib`, and `types`
-- reusable UI primitives such as `Modal`, `Badge`, and `MemberChip`
-- central business logic in `src/lib/calculations.ts`
-- centralized group state management in `src/hooks/useGroups.ts`
-- API route validation for groups, expenses, settlements, and AI requests
-- updated README with architecture and setup notes
+## Feature Implementation
 
-### 3. Real-Time Performance
+### 1. Group Management
 
-Implemented:
+- users can create a group with a name, optional description, and at least two members
+- duplicate member names and duplicate emails are rejected
+- users can add members later from the group details page
+- groups are stored locally and restored on refresh
 
-- instant UI updates through local state plus `localStorage`
-- cross-tab synchronization using the browser `storage` event
-- local-first persistence with no backend roundtrip needed for main flows
-- lightweight client-side balance and settlement calculations
+### 2. Expense Management
 
-### 4. AI Accuracy
+- users can add an expense with description, amount, category, date, payer, and split type
+- equal split mode distributes the amount across all members
+- custom split mode allows exact per-member allocations
+- custom split values are validated against the total amount
+- expense history supports sorting and filtering for easier review
 
-For this project, the PDF product scope is expense categorization and spending insights. One evaluation line in the PDF mentions email categorization and suggested replies, which appears to be unrelated to this assignment. This implementation aligns AI with the actual Smart Expense Splitter problem statement.
+### 3. Balances and Settlements
 
-Implemented:
+- balances are recalculated automatically after every expense or settlement
+- the app shows who owes whom and how much
+- a settlement suggestion algorithm minimizes the number of transactions
+- completed settlements are persisted in group history
 
-- AI-based expense categorization endpoint
-- AI-based spending insight endpoint
-- keyword-based fallback categorization when no API key is present
-- fallback insight generation when external AI is unavailable
+### 4. Analytics and AI
+
+- spending charts show category distribution and recent daily spending
+- AI categorization can infer categories from expense descriptions
+- AI insights summarize spending behavior and unusual patterns
+- if no API key is present, local fallback logic keeps AI-related UX functional
 
 ### 5. UX and UI
 
-Implemented:
+- responsive layout for desktop and mobile
+- clear modal-based flows for creating groups, adding members, and adding expenses
+- consistent reusable UI primitives
+- readable balance and settlement presentation
+- improved member display using full-name chips instead of ambiguous initials
 
-- responsive dashboard
-- clear group overview cards
-- filterable and sortable expense history
-- clean balances and settlement views
-- accessible modal-based flows for creating groups, adding members, and adding expenses
-- improved member name display using reusable chips instead of ambiguous initials
+## Evaluation Criteria Mapping
 
-### 6. Bonus Features and Optimizations
+### Feature Completion
 
-Implemented:
+The core assignment requirements from the PDF are implemented, along with optional analytics and AI helpers.
 
-- settlement completion tracking
-- settlement history
-- post-creation member management
-- AI fallback mode
-- reusable `MemberChip` component to reduce repeated markup
+### Code Quality and Scalability
 
-## Current Folder Structure
+The codebase is modular and separated by route, feature, shared business logic, and types. Reusable utilities and UI primitives are centralized to avoid duplication.
 
-```text
-src/
-  app/
-    api/
-      ai/route.ts
-      expenses/route.ts
-      groups/route.ts
-      settlements/route.ts
-    groups/[id]/page.tsx
-    globals.css
-    layout.tsx
-    page.tsx
-  components/
-    dashboard/
-      AIInsightsPanel.tsx
-      SpendingChart.tsx
-    expenses/
-      AddExpenseModal.tsx
-      ExpenseList.tsx
-    groups/
-      AddMemberModal.tsx
-      CreateGroupModal.tsx
-      GroupCard.tsx
-    settlements/
-      BalanceCard.tsx
-      SettlementList.tsx
-    ui/
-      Badge.tsx
-      MemberChip.tsx
-      Modal.tsx
-  hooks/
-    useGroups.ts
-  lib/
-    calculations.ts
-    storage.ts
-    utils.ts
-  types/
-    index.ts
-```
+### UX and UI
 
-This structure is intentionally organized by responsibility:
+The interface is designed to be lightweight, fast, and easy to understand during common group-expense workflows.
 
-- `app/` handles routes and pages
-- `components/` contains UI and feature-specific React components
-- `hooks/` contains reusable client logic
-- `lib/` contains shared business logic and helpers
-- `types/` contains domain models
+### Bonus Points
 
-## Architecture Overview
+Additional improvements include settlement history persistence, reusable member chips, fallback AI mode, sorting and filtering support, and a cleaner assignment-ready documentation structure.
+
+## Tech Stack
+
+- Next.js 14
+- React 18
+- TypeScript
+- Tailwind CSS
+- Recharts
+- Lucide React
+- UUID
+
+## Architecture
 
 ### Frontend
 
-- Next.js 14 App Router
-- React 18 client components for interactive flows
-- Tailwind CSS for styling
-- Recharts for analytics visualizations
+- App Router pages under `src/app`
+- client-side interactive components for group, expense, and settlement workflows
+- reusable UI layer for shared presentation patterns
 
-### Data Layer
+### State and Persistence
 
-- browser `localStorage` as the persistence layer
-- `useGroups` as the primary client-side data orchestration hook
-- normalization in `storage.ts` to keep persisted data shape stable
+- browser `localStorage` acts as the persistence layer
+- `useGroups` is the main client hook for group state orchestration
+- storage normalization keeps persisted data shape predictable
 
 ### Business Logic
 
-- `calculations.ts` computes balances, settlements, and summaries
-- settlement history is applied on top of expenses so balances remain accurate after settle-up actions
+- `src/lib/calculations.ts` handles balance and settlement calculations
+- `src/lib/utils.ts` contains shared UI and formatting helpers
+- domain types are centralized in `src/types/index.ts`
 
 ### API Layer
 
-- `POST /api/groups` validates and shapes group data
-- `POST /api/expenses` validates expense and split data
-- `POST /api/settlements` returns balances and suggested settlements
-- `POST /api/ai` handles categorization and insight generation
+The app exposes lightweight API routes for validation and request shaping:
 
-## Main Features
+- `POST /api/groups`
+- `POST /api/expenses`
+- `POST /api/settlements`
+- `POST /api/ai`
 
-### Group Management
+## Folder Structure
 
-- create groups with name and optional description
-- require at least two unique members at creation time
-- add more members later from the group details page
+```text
+smart-expense-splitter/
+├─ src/
+│  ├─ app/
+│  │  ├─ api/
+│  │  │  ├─ ai/route.ts
+│  │  │  ├─ expenses/route.ts
+│  │  │  ├─ groups/route.ts
+│  │  │  └─ settlements/route.ts
+│  │  ├─ groups/[id]/page.tsx
+│  │  ├─ globals.css
+│  │  ├─ layout.tsx
+│  │  └─ page.tsx
+│  ├─ components/
+│  │  ├─ dashboard/
+│  │  │  ├─ AIInsightsPanel.tsx
+│  │  │  └─ SpendingChart.tsx
+│  │  ├─ expenses/
+│  │  │  ├─ AddExpenseModal.tsx
+│  │  │  └─ ExpenseList.tsx
+│  │  ├─ groups/
+│  │  │  ├─ AddMemberModal.tsx
+│  │  │  ├─ CreateGroupModal.tsx
+│  │  │  └─ GroupCard.tsx
+│  │  ├─ settlements/
+│  │  │  ├─ BalanceCard.tsx
+│  │  │  └─ SettlementList.tsx
+│  │  └─ ui/
+│  │     ├─ Badge.tsx
+│  │     ├─ MemberChip.tsx
+│  │     └─ Modal.tsx
+│  ├─ hooks/
+│  │  └─ useGroups.ts
+│  ├─ lib/
+│  │  ├─ calculations.ts
+│  │  ├─ storage.ts
+│  │  └─ utils.ts
+│  └─ types/
+│     └─ index.ts
+├─ package.json
+├─ tailwind.config.js
+├─ tsconfig.json
+└─ README.md
+```
 
-### Expense Management
+Folder responsibilities:
 
-- add expense description, amount, date, category, and payer
-- split equally across all members
-- split with custom per-member values
-- validate that custom split totals match the expense total
-- filter expenses by date
-- sort expenses by newest, oldest, highest, and lowest
+- `src/app`: routes, pages, layout, and API endpoints
+- `src/components`: feature-level and shared UI components
+- `src/hooks`: reusable client-side state logic
+- `src/lib`: business logic, persistence helpers, and utilities
+- `src/types`: domain models and shared TypeScript types
 
-### Balances and Settlements
-
-- real-time per-member balances
-- greedy settlement suggestion algorithm to minimize transactions
-- mark settlements as completed
-- persist completed settlement history
-
-### Analytics and AI
-
-- category distribution chart
-- daily spending chart
-- AI insight panel
-- AI categorization on description blur
-- local fallback insights when external AI is unavailable
-
-## Setup
+## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+
-- npm 9+
+- Node.js 18 or later
+- npm 9 or later
 
-### Install
+### 1. Install Dependencies
 
 ```bash
 npm install
 ```
 
-### Environment Variables
+### 2. Configure Environment Variables
 
-Create `.env.local` to enable live AI calls:
+Create a `.env.local` file in the project root.
 
 ```env
-ANTHROPIC_API_KEY=your_key_here
+OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_MODEL=gpt-4.1-mini
 ```
 
-Without this key, the app still works. It automatically falls back to local categorization and locally generated insights.
+If `OPENAI_API_KEY` is not set, the app still works using local fallback logic for categorization and insights.
 
-### Run Locally
+### 3. Start the Development Server
 
 ```bash
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Open [http://localhost:3000](http://localhost:3000).
+
+## Usage Flow
+
+1. Create a group with at least two members.
+2. Open the group details page.
+3. Add shared expenses and choose equal or custom split mode.
+4. Review live balances, debt summary, and settlement suggestions.
+5. Mark settlements as completed when members settle up.
+6. Use the analytics and AI sections for spending insights.
 
 ## Verification
 
-The project was verified with:
+The project has been verified with:
 
 ```bash
 npm run lint
@@ -239,28 +255,43 @@ npm run build
 
 ## Deployment
 
-The PDF requires deployment on Vercel or Netlify. The project is deployment-ready, but the final deployment itself must be done from your own account.
+The PDF requires the app to be accessible online using Vercel or Netlify.
 
-### Vercel
+### Deploy on Vercel
 
-- import the project into Vercel
-- set `ANTHROPIC_API_KEY` if you want live AI responses
-- deploy
+1. Push the repository to GitHub.
+2. Import the repository into Vercel.
+3. Add `OPENAI_API_KEY` in Vercel environment variables if live AI is required.
+4. Optionally add `OPENAI_MODEL` if you want to override the default model.
+5. Deploy the project.
 
-### Netlify
+### Deploy on Netlify
 
-- build command: `npm run build`
-- publish directory: `.next`
+1. Push the repository to GitHub.
+2. Import the repository into Netlify.
+3. Configure the Next.js build settings as needed.
+4. Add `OPENAI_API_KEY` if live AI is required.
+5. Optionally add `OPENAI_MODEL` if you want to override the default model.
+6. Deploy the project.
 
 ## Submission Checklist
 
-- public GitHub repository
-- updated README
-- demo video under 5 minutes
-- deployed app link
+Before final submission, complete the remaining PDF submission steps:
 
-## Notes
+- create a public GitHub repository
+- push the latest code
+- keep this README updated
+- record a demo video under 5 minutes
+- deploy on Vercel or Netlify
+- share the repository link and live deployment link
 
-- data is browser-local by design because the assignment did not require a full backend
-- multi-user cloud sync is not implemented
-- the core assignment requirements from the PDF are implemented in this repository
+## Assumptions and Scope Notes
+
+- this implementation is local-first and stores data in the browser
+- a full backend and multi-user server sync were not required by the PDF
+- AI is applied to expense workflows because that matches the Smart Expense Splitter problem statement
+- the final deployment, public repository creation, and demo video depend on your own accounts and submission process
+
+## Author Note
+
+This codebase was organized and documented to match the assignment intent: a lightweight, user-friendly, quickly deployable Smart Expense Splitter with clean structure, scalable code organization, and polished UX.

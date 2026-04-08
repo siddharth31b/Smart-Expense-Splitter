@@ -1,15 +1,15 @@
 "use client";
 import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
 } from "recharts";
 import { Expense } from "@/types";
 import { CATEGORY_META, formatCurrency } from "@/lib/utils";
@@ -65,9 +65,9 @@ export function SpendingChart({ expenses }: Props) {
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-      <div className="glass-card p-5">
+      <div className="glass-card p-4 sm:p-5">
         <h3 className="mb-4 font-semibold text-white">By Category</h3>
-        <ResponsiveContainer width="100%" height={200}>
+        <ResponsiveContainer width="100%" height={190}>
           <PieChart>
             <Pie
               data={pieData}
@@ -95,17 +95,17 @@ export function SpendingChart({ expenses }: Props) {
         </ResponsiveContainer>
         <div className="mt-2 space-y-1.5">
           {pieData.map((item, index) => (
-            <div key={index} className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2">
+            <div key={index} className="flex items-center justify-between gap-3 text-xs">
+              <div className="flex min-w-0 items-center gap-2">
                 <span
                   className="h-2 w-2 flex-shrink-0 rounded-full"
                   style={{ background: COLORS[index % COLORS.length] }}
                 />
-                <span className="text-slate-400">
+                <span className="truncate text-slate-400">
                   {item.emoji} {item.name}
                 </span>
               </div>
-              <span className="font-medium text-slate-300">
+              <span className="flex-shrink-0 font-medium text-slate-300">
                 {formatCurrency(item.value)}
               </span>
             </div>
@@ -114,10 +114,8 @@ export function SpendingChart({ expenses }: Props) {
       </div>
 
       {barData.length > 1 && (
-        <div className="glass-card p-5">
-          <h3 className="mb-4 font-semibold text-white">
-            Daily Spending (Last 7 days)
-          </h3>
+        <div className="glass-card p-4 sm:p-5">
+          <h3 className="mb-4 font-semibold text-white">Daily Spending (Last 7 days)</h3>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={barData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e2737" />

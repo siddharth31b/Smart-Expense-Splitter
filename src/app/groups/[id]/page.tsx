@@ -52,7 +52,7 @@ export default function GroupPage({ params }: PageProps) {
 
   if (!group) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="text-slate-500">Loading...</div>
       </div>
     );
@@ -88,7 +88,7 @@ export default function GroupPage({ params }: PageProps) {
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-40 border-b border-surface-border bg-surface-card/50 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
+        <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push("/")}
@@ -97,20 +97,20 @@ export default function GroupPage({ params }: PageProps) {
               <ArrowLeft size={18} />
             </button>
 
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/20">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/20">
                 <SplitSquareHorizontal size={16} className="text-emerald-400" />
               </div>
-              <span className="text-lg font-bold text-white">SplitWise</span>
+              <span className="truncate text-lg font-bold text-white">SplitWise</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:items-center">
             <button
               onClick={() => setShowAddMember(true)}
               className="rounded-xl border border-surface-border px-4 py-2.5 text-sm font-medium text-slate-300 transition-colors hover:border-emerald-500/40 hover:text-white"
             >
-              <span className="flex items-center gap-2">
+              <span className="flex items-center justify-center gap-2">
                 <UserPlus size={15} />
                 Add Member
               </span>
@@ -118,7 +118,7 @@ export default function GroupPage({ params }: PageProps) {
 
             <button
               onClick={() => setShowAddExpense(true)}
-              className="btn-primary flex items-center gap-2"
+              className="btn-primary flex items-center justify-center gap-2"
             >
               <Plus size={15} />
               Add Expense
@@ -127,32 +127,60 @@ export default function GroupPage({ params }: PageProps) {
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl space-y-6 px-4 py-6">
+      <main className="mx-auto max-w-5xl space-y-6 px-4 py-5 sm:py-6">
         <div className="glass-card p-5">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-start">
-            <div className="flex items-start gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-500/20 bg-emerald-500/10">
-                <Users size={24} className="text-emerald-400" />
-              </div>
+          <div className="space-y-5">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-start gap-4">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl border border-emerald-500/20 bg-emerald-500/10 sm:h-14 sm:w-14">
+                  <Users size={24} className="text-emerald-400" />
+                </div>
 
-              <div className="flex-1">
-                <h1 className="text-2xl font-bold text-white">{group.name}</h1>
-                {group.description && (
-                  <p className="text-sm text-slate-500">{group.description}</p>
-                )}
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                    <div className="min-w-0">
+                      <h1 className="break-words text-2xl font-bold text-white sm:text-3xl">
+                        {group.name}
+                      </h1>
+                      {group.description && (
+                        <p className="mt-1 text-sm text-slate-500">{group.description}</p>
+                      )}
+                    </div>
 
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {group.members.map((member) => (
-                    <MemberChip key={member.id} name={member.name} className="px-3" />
-                  ))}
+                    <div className="w-fit rounded-xl border border-surface-border bg-surface px-3 py-2 text-sm text-slate-400">
+                      <span className="font-semibold text-white">{group.members.length}</span>{" "}
+                      members
+                    </div>
+                  </div>
+
+                  <div className="mt-4 rounded-2xl border border-surface-border bg-surface/70 p-3">
+                    <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                      <p className="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">
+                        Group Members
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        Added members appear here instantly
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      {group.members.map((member) => (
+                        <MemberChip
+                          key={member.id}
+                          name={member.name}
+                          className="max-w-full px-3 py-1.5 text-sm"
+                        />
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
               <div className="rounded-2xl border border-surface-border bg-surface p-4">
                 <p className="text-xs text-slate-500">Total Spent</p>
-                <p className="mt-1 text-xl font-bold text-white">
+                <p className="mt-1 break-words text-xl font-bold text-white">
                   {formatCurrency(totalSpent)}
                 </p>
                 <p className="mt-1 text-xs text-slate-500">
@@ -162,7 +190,7 @@ export default function GroupPage({ params }: PageProps) {
 
               <div className="rounded-2xl border border-surface-border bg-surface p-4">
                 <p className="text-xs text-slate-500">Outstanding</p>
-                <p className="mt-1 text-xl font-bold text-amber-400">
+                <p className="mt-1 break-words text-xl font-bold text-amber-400">
                   {formatCurrency(outstandingTotal)}
                 </p>
                 <p className="mt-1 text-xs text-slate-500">
@@ -183,12 +211,12 @@ export default function GroupPage({ params }: PageProps) {
           </div>
         </div>
 
-        <div className="flex gap-1 rounded-xl bg-surface-card p-1">
+        <div className="grid grid-cols-1 gap-1 rounded-xl bg-surface-card p-1 sm:grid-cols-3">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm transition-colors ${
+              className={`flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm transition-colors ${
                 activeTab === tab.id
                   ? "bg-emerald-500 text-white"
                   : "text-slate-400 hover:text-white"

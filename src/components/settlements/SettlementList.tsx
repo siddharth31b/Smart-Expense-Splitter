@@ -37,10 +37,10 @@ export function SettlementList({ settlements, history = [], onSettle }: Props) {
             {settlements.map((settlement, index) => (
               <div
                 key={index}
-                className="flex items-center gap-3 rounded-xl border border-surface-border bg-white/[0.03] p-3"
+                className="flex flex-col gap-3 rounded-xl border border-surface-border bg-white/[0.03] p-3 sm:flex-row sm:items-center"
               >
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <MemberChip name={settlement.fromName} />
                     <ArrowRight size={13} className="flex-shrink-0 text-slate-500" />
                     <MemberChip name={settlement.toName} tone="blue" />
@@ -48,7 +48,7 @@ export function SettlementList({ settlements, history = [], onSettle }: Props) {
                   <p className="mt-1 text-xs text-slate-500">Payment to settle debt</p>
                 </div>
 
-                <div className="ml-2 flex-shrink-0 text-right">
+                <div className="flex-shrink-0 text-left sm:ml-2 sm:text-right">
                   <p className="font-bold text-amber-400">
                     {formatCurrency(settlement.amount)}
                   </p>
@@ -57,7 +57,7 @@ export function SettlementList({ settlements, history = [], onSettle }: Props) {
                 {onSettle && (
                   <button
                     onClick={() => onSettle(settlement)}
-                    className="ml-2 flex-shrink-0 rounded-lg p-2 text-slate-500 transition-all hover:bg-emerald-500/10 hover:text-emerald-400"
+                    className="flex w-full items-center justify-center rounded-lg border border-surface-border px-3 py-2 text-slate-400 transition-all hover:bg-emerald-500/10 hover:text-emerald-400 sm:ml-2 sm:w-auto sm:border-transparent sm:px-2 sm:py-2"
                     title="Mark as settled"
                   >
                     <CheckCircle2 size={16} />
@@ -79,7 +79,7 @@ export function SettlementList({ settlements, history = [], onSettle }: Props) {
               .map((settlement) => (
                 <div
                   key={settlement.id}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-surface-border bg-white/[0.03] p-3"
+                  className="flex flex-col gap-2 rounded-xl border border-surface-border bg-white/[0.03] p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
                 >
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-white">
@@ -87,7 +87,7 @@ export function SettlementList({ settlements, history = [], onSettle }: Props) {
                     </p>
                     <p className="mt-1 text-xs text-slate-500">
                       {formatDate(settlement.date)}
-                      {settlement.note ? ` · ${settlement.note}` : ""}
+                      {settlement.note ? ` • ${settlement.note}` : ""}
                     </p>
                   </div>
                   <span className="text-sm font-semibold text-emerald-400">

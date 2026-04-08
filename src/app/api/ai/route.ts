@@ -1,25 +1,79 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AIInsight, ExpenseCategory } from "@/types";
 
-const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
-const MODEL = "claude-sonnet-4-20250514";
+const OPENAI_API_URL = "https://api.openai.com/v1/responses";
+const DEFAULT_MODEL = "gpt-4.1-mini";
 
 const CATEGORY_KEYWORDS: Record<ExpenseCategory, string[]> = {
-  food: ["food", "dinner", "lunch", "breakfast", "cafe", "coffee", "pizza", "restaurant", "snack", "zomato", "swiggy"],
-  travel: ["travel", "trip", "flight", "train", "uber", "ola", "taxi", "bus", "metro", "petrol", "fuel", "hotel"],
+  food: [
+    "food",
+    "dinner",
+    "lunch",
+    "breakfast",
+    "cafe",
+    "coffee",
+    "pizza",
+    "restaurant",
+    "snack",
+    "zomato",
+    "swiggy",
+  ],
+  travel: [
+    "travel",
+    "trip",
+    "flight",
+    "train",
+    "uber",
+    "ola",
+    "taxi",
+    "bus",
+    "metro",
+    "petrol",
+    "fuel",
+    "hotel",
+  ],
   rent: ["rent", "lease", "deposit", "apartment", "flat", "room"],
-  entertainment: ["movie", "concert", "party", "game", "netflix", "spotify", "club", "event"],
+  entertainment: [
+    "movie",
+    "concert",
+    "party",
+    "game",
+    "netflix",
+    "spotify",
+    "club",
+    "event",
+  ],
   utilities: ["electricity", "water", "wifi", "internet", "gas", "bill", "recharge"],
   shopping: ["shopping", "mall", "amazon", "flipkart", "grocery", "store", "clothes"],
   health: ["doctor", "medicine", "hospital", "pharmacy", "health", "clinic", "medical"],
   other: [],
 };
 
+const CATEGORY_VALUES: ExpenseCategory[] = [
+  "food",
+  "travel",
+  "rent",
+  "entertainment",
+  "utilities",
+  "shopping",
+  "health",
+  "other",
+];
+
 type InsightExpense = {
   description: string;
   amount: number;
   category: string;
   date: string;
+};
+
+type OpenAIResponse = {
+  output_text?: string;
+  output?: Array<{
+    content?: Array<{
+      text?: string;
+    }>;
+  }>;
 };
 
 export async function POST(req: NextRequest) {
@@ -48,53 +102,41 @@ async function categorizeExpense(description: string) {
     return NextResponse.json({ category: "other" as ExpenseCategory, confidence: 0 });
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY ?? "";
-  if (!apiKey) {
-    return NextResponse.json(inferCategory(trimmedDescription));
-  }
-
-  const systemPrompt = `You are an expense categorization assistant. Given an expense description, return ONLY a JSON object with:
-- "category": one of ["food", "travel", "rent", "entertainment", "utilities", "shopping", "health", "other"]
-- "confidence": number 0-1
-
-Return ONLY valid JSON, no markdown, no explanation.`;
-
-  try {
-    const res = await fetch(ANTHROPIC_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
+  const parsed = await requestStructuredJson({
+    prompt: [
+      "You categorize expense descriptions for a group expense app.",
+      `Description: "${trimmedDescription}"`,
+      `Allowed categories: ${CATEGORY_VALUES.join(", ")}.`,
+      "Choose the single best category and a confidence between 0 and 1.",
+    ].join("\n"),
+    schemaName: "expense_category",
+    schema: {
+      type: "object",
+      additionalProperties: false,
+      required: ["category", "confidence"],
+      properties: {
+        category: {
+          type: "string",
+          enum: CATEGORY_VALUES,
+        },
+        confidence: {
+          type: "number",
+          minimum: 0,
+          maximum: 1,
+        },
       },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 100,
-        system: systemPrompt,
-        messages: [
-          {
-            role: "user",
-            content: `Categorize this expense: "${trimmedDescription}"`,
-          },
-        ],
-      }),
-    });
+    },
+  });
 
-    if (!res.ok) {
-      return NextResponse.json(inferCategory(trimmedDescription));
-    }
-
-    const data = await res.json();
-    const text = data.content?.[0]?.text ?? "{}";
-    const parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
-
-    return NextResponse.json({
-      category: (parsed.category as ExpenseCategory) ?? "other",
-      confidence: parsed.confidence ?? 0.5,
-    });
-  } catch {
+  if (!parsed) {
     return NextResponse.json(inferCategory(trimmedDescription));
   }
+
+  return NextResponse.json({
+    category: (parsed.category as ExpenseCategory) ?? "other",
+    confidence:
+      typeof parsed.confidence === "number" ? parsed.confidence : 0.5,
+  });
 }
 
 async function generateInsights(expenses: InsightExpense[]) {
@@ -102,50 +144,121 @@ async function generateInsights(expenses: InsightExpense[]) {
     return NextResponse.json({ insights: [] });
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY ?? "";
-  if (!apiKey) {
+  const summary = expenses
+    .map(
+      (expense) =>
+        `${expense.category}: INR ${expense.amount} - ${expense.description} (${expense.date})`
+    )
+    .join("\n");
+
+  const parsed = await requestStructuredJson({
+    prompt: [
+      "You are a personal finance assistant for a group expense splitter.",
+      "Analyze the expense list and return 2 to 4 concise insights.",
+      'Each insight must have a "type" of warning, info, or tip.',
+      "Each message must be actionable and under 80 characters when possible.",
+      "Expense list:",
+      summary,
+    ].join("\n"),
+    schemaName: "expense_insights",
+    schema: {
+      type: "object",
+      additionalProperties: false,
+      required: ["insights"],
+      properties: {
+        insights: {
+          type: "array",
+          minItems: 2,
+          maxItems: 4,
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["type", "message"],
+            properties: {
+              type: {
+                type: "string",
+                enum: ["warning", "info", "tip"],
+              },
+              message: {
+                type: "string",
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!parsed || !Array.isArray(parsed.insights)) {
     return NextResponse.json({ insights: buildFallbackInsights(expenses) });
   }
 
-  const systemPrompt = `You are a personal finance analyst. Analyze spending patterns from the given expense list and return ONLY a JSON array of insight objects.
+  return NextResponse.json({ insights: parsed.insights as AIInsight[] });
+}
 
-Each object has:
-- "type": "warning" | "info" | "tip"
-- "message": a concise, actionable insight (max 80 chars)
-
-Return 2-4 insights. Return ONLY valid JSON array, no markdown.`;
-
-  const summary = expenses
-    .map((expense) => `${expense.category}: INR ${expense.amount} - ${expense.description}`)
-    .join("\n");
+async function requestStructuredJson({
+  prompt,
+  schemaName,
+  schema,
+}: {
+  prompt: string;
+  schemaName: string;
+  schema: Record<string, unknown>;
+}) {
+  const apiKey = process.env.OPENAI_API_KEY ?? "";
+  if (!apiKey) {
+    return null;
+  }
 
   try {
-    const res = await fetch(ANTHROPIC_API_URL, {
+    const response = await fetch(OPENAI_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 400,
-        system: systemPrompt,
-        messages: [{ role: "user", content: `Expenses:\n${summary}` }],
+        model: process.env.OPENAI_MODEL || DEFAULT_MODEL,
+        input: prompt,
+        text: {
+          format: {
+            type: "json_schema",
+            name: schemaName,
+            strict: true,
+            schema,
+          },
+        },
       }),
     });
 
-    if (!res.ok) {
-      return NextResponse.json({ insights: buildFallbackInsights(expenses) });
+    if (!response.ok) {
+      return null;
     }
 
-    const data = await res.json();
-    const text = data.content?.[0]?.text ?? "[]";
-    const insights = JSON.parse(text.replace(/```json|```/g, "").trim()) as AIInsight[];
-    return NextResponse.json({ insights });
+    const data = (await response.json()) as OpenAIResponse;
+    const text = extractResponseText(data);
+    if (!text) {
+      return null;
+    }
+
+    return JSON.parse(text) as Record<string, unknown>;
   } catch {
-    return NextResponse.json({ insights: buildFallbackInsights(expenses) });
+    return null;
   }
+}
+
+function extractResponseText(response: OpenAIResponse) {
+  if (response.output_text?.trim()) {
+    return response.output_text.trim();
+  }
+
+  const parts =
+    response.output
+      ?.flatMap((item) => item.content ?? [])
+      .map((content) => content.text?.trim() ?? "")
+      .filter(Boolean) ?? [];
+
+  return parts.join("\n").trim();
 }
 
 function inferCategory(description: string): {
