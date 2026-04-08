@@ -151,9 +151,6 @@ export default function GroupPage({ params }: PageProps) {
                       </span>
                     ))}
                   </div>
-                  <span className="text-xs text-slate-500">
-                    {group.members.map((member) => member.name).join(", ")}
-                  </span>
                 </div>
               </div>
             </div>

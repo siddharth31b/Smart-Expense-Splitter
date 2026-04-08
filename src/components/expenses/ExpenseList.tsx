@@ -161,11 +161,6 @@ export function ExpenseList({ expenses, members, onDelete }: Props) {
               </div>
 
               <div className="mt-1 flex items-center gap-2">
-                {payer && (
-                  <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-300">
-                    {payer.name}
-                  </span>
-                )}
                 <span className="text-xs text-slate-500">
                   {(payer?.name ?? "Unknown")} paid · {formatDate(expense.date)} ·{" "}
                   {expense.splitType === "equal" ? "Split equally" : "Custom split"}
