@@ -1,8 +1,9 @@
 "use client";
 
+import { ArrowRight, CheckCircle2, PartyPopper } from "lucide-react";
 import { Settlement, SettlementRecord } from "@/types";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { ArrowRight, CheckCircle2, PartyPopper } from "lucide-react";
+import { MemberChip } from "@/components/ui/MemberChip";
 
 interface Props {
   settlements: Settlement[];
@@ -40,13 +41,9 @@ export function SettlementList({ settlements, history = [], onSettle }: Props) {
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-300">
-                      {settlement.fromName}
-                    </span>
+                    <MemberChip name={settlement.fromName} />
                     <ArrowRight size={13} className="flex-shrink-0 text-slate-500" />
-                    <span className="rounded-full border border-sky-500/20 bg-sky-500/10 px-2.5 py-1 text-xs font-medium text-sky-300">
-                      {settlement.toName}
-                    </span>
+                    <MemberChip name={settlement.toName} tone="blue" />
                   </div>
                   <p className="mt-1 text-xs text-slate-500">Payment to settle debt</p>
                 </div>

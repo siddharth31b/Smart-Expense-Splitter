@@ -1,8 +1,9 @@
 "use client";
 
+import { TrendingDown, TrendingUp, Minus } from "lucide-react";
 import { MemberBalance } from "@/types";
 import { formatCurrency } from "@/lib/utils";
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { MemberChip } from "@/components/ui/MemberChip";
 
 interface Props {
   balances: MemberBalance[];
@@ -21,9 +22,7 @@ export function BalanceCard({ balances }: Props) {
             <div key={balance.memberId} className="flex items-center gap-3">
               <div className="min-w-0 flex-1">
                 <div className="mb-1">
-                  <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-300">
-                    {balance.memberName}
-                  </span>
+                  <MemberChip name={balance.memberName} />
                 </div>
                 <p className="text-xs text-slate-500">
                   Paid {formatCurrency(balance.totalPaid)} · Owed{" "}

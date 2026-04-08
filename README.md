@@ -1,48 +1,93 @@
 # Smart Expense Splitter
 
-Assignment implementation for NeevAI SuperCloud Pvt. Ltd.
+Professional assignment implementation for NeevAI SuperCloud Pvt. Ltd.
 
-This project is a lightweight expense-splitting web app built with Next.js 14, TypeScript, and Tailwind CSS. It lets users create groups, add members, split expenses equally or with custom shares, view live balances, and track settlements. Optional AI helpers are included for expense categorization and spending insights, with local fallbacks when no API key is configured.
+This project is a lightweight expense-splitting web application built with Next.js 14, TypeScript, and Tailwind CSS. It helps users create groups, add members, record shared expenses, split them equally or with custom shares, calculate live balances, and settle debts with a clean local-first UX. Optional AI helpers are included for expense categorization and spending insights, with graceful local fallbacks when an API key is not configured.
 
-## Assignment Coverage
+## Problem Statement Coverage
 
-Implemented from the PDF:
+The shared PDF asked for a Smart Expense Splitter that should:
 
-- Create groups and add members
-- Add shared expenses
-- Split expenses equally or with custom amounts
-- Calculate balances automatically
-- Show who owes whom
-- Provide a settlement summary
-- Ready for deployment on Vercel or Netlify
+- create groups and add members
+- add and split shared expenses equally or custom
+- calculate balances automatically
+- clearly show who owes whom
+- provide a debt and settlement summary
+- be deployable on Vercel or Netlify
 
-Good-to-have AI features implemented:
+This codebase implements all of the product requirements inside the PDF. The only step that still depends on your own accounts is final public deployment and GitHub submission.
 
-- Smart expense categorization
-- Spending insights and analytics
-- Graceful non-AI fallback when no API key is present
+## Evaluation Criteria Mapping
 
-Additional improvements:
+### 1. Feature Completion
 
-- Add members after group creation
-- Persist completed settlements
-- Filter and sort expense history
-- Recent settlement history on the group page
-- Cross-tab localStorage syncing
+Implemented:
 
-## Tech Stack
+- group creation with validation
+- member creation during group setup
+- member addition after group creation
+- equal split expenses
+- custom split expenses
+- automatic balance calculation
+- suggested settlements
+- settlement history persistence
+- expense analytics dashboard
+- AI categorization
+- AI spending insights
 
-- Next.js 14 App Router
-- React 18
-- TypeScript
-- Tailwind CSS
-- Recharts
-- Lucide React
-- UUID
-- localStorage for persistence
-- Anthropic API for optional AI features
+### 2. Code Quality and Scalability
 
-## Project Structure
+Implemented:
+
+- modular separation across `app`, `components`, `hooks`, `lib`, and `types`
+- reusable UI primitives such as `Modal`, `Badge`, and `MemberChip`
+- central business logic in `src/lib/calculations.ts`
+- centralized group state management in `src/hooks/useGroups.ts`
+- API route validation for groups, expenses, settlements, and AI requests
+- updated README with architecture and setup notes
+
+### 3. Real-Time Performance
+
+Implemented:
+
+- instant UI updates through local state plus `localStorage`
+- cross-tab synchronization using the browser `storage` event
+- local-first persistence with no backend roundtrip needed for main flows
+- lightweight client-side balance and settlement calculations
+
+### 4. AI Accuracy
+
+For this project, the PDF product scope is expense categorization and spending insights. One evaluation line in the PDF mentions email categorization and suggested replies, which appears to be unrelated to this assignment. This implementation aligns AI with the actual Smart Expense Splitter problem statement.
+
+Implemented:
+
+- AI-based expense categorization endpoint
+- AI-based spending insight endpoint
+- keyword-based fallback categorization when no API key is present
+- fallback insight generation when external AI is unavailable
+
+### 5. UX and UI
+
+Implemented:
+
+- responsive dashboard
+- clear group overview cards
+- filterable and sortable expense history
+- clean balances and settlement views
+- accessible modal-based flows for creating groups, adding members, and adding expenses
+- improved member name display using reusable chips instead of ambiguous initials
+
+### 6. Bonus Features and Optimizations
+
+Implemented:
+
+- settlement completion tracking
+- settlement history
+- post-creation member management
+- AI fallback mode
+- reusable `MemberChip` component to reduce repeated markup
+
+## Current Folder Structure
 
 ```text
 src/
@@ -58,10 +103,22 @@ src/
     page.tsx
   components/
     dashboard/
+      AIInsightsPanel.tsx
+      SpendingChart.tsx
     expenses/
+      AddExpenseModal.tsx
+      ExpenseList.tsx
     groups/
+      AddMemberModal.tsx
+      CreateGroupModal.tsx
+      GroupCard.tsx
     settlements/
+      BalanceCard.tsx
+      SettlementList.tsx
     ui/
+      Badge.tsx
+      MemberChip.tsx
+      Modal.tsx
   hooks/
     useGroups.ts
   lib/
@@ -72,49 +129,74 @@ src/
     index.ts
 ```
 
-## Architecture Notes
+This structure is intentionally organized by responsibility:
 
-- Client state is stored in `localStorage` for a fast, zero-backend workflow.
-- API routes are used as validation and orchestration layers for group creation, expenses, settlements, and AI operations.
-- Core financial logic lives in `src/lib/calculations.ts`.
-- `useGroups` centralizes group CRUD, expense updates, member additions, and settlement persistence.
-- The app remains usable even without an AI key by falling back to local keyword-based categorization and generated insights.
+- `app/` handles routes and pages
+- `components/` contains UI and feature-specific React components
+- `hooks/` contains reusable client logic
+- `lib/` contains shared business logic and helpers
+- `types/` contains domain models
+
+## Architecture Overview
+
+### Frontend
+
+- Next.js 14 App Router
+- React 18 client components for interactive flows
+- Tailwind CSS for styling
+- Recharts for analytics visualizations
+
+### Data Layer
+
+- browser `localStorage` as the persistence layer
+- `useGroups` as the primary client-side data orchestration hook
+- normalization in `storage.ts` to keep persisted data shape stable
+
+### Business Logic
+
+- `calculations.ts` computes balances, settlements, and summaries
+- settlement history is applied on top of expenses so balances remain accurate after settle-up actions
+
+### API Layer
+
+- `POST /api/groups` validates and shapes group data
+- `POST /api/expenses` validates expense and split data
+- `POST /api/settlements` returns balances and suggested settlements
+- `POST /api/ai` handles categorization and insight generation
 
 ## Main Features
 
-### 1. Group Management
+### Group Management
 
-- Create a group with name, description, and at least two members
-- Add more members later from the group details page
-- Duplicate member names and emails are validated
+- create groups with name and optional description
+- require at least two unique members at creation time
+- add more members later from the group details page
 
-### 2. Expense Management
+### Expense Management
 
-- Add expense description, amount, date, payer, and category
-- Equal split across all members
-- Custom split with per-member amount entry
-- Expense history with sorting and date filters
+- add expense description, amount, date, category, and payer
+- split equally across all members
+- split with custom per-member values
+- validate that custom split totals match the expense total
+- filter expenses by date
+- sort expenses by newest, oldest, highest, and lowest
 
-### 3. Balances and Settlements
+### Balances and Settlements
 
-- Automatic per-member balance calculation
-- Suggested debt settlements using a greedy minimum-transaction approach
-- Mark a suggested settlement as completed
-- View recent completed settlements
+- real-time per-member balances
+- greedy settlement suggestion algorithm to minimize transactions
+- mark settlements as completed
+- persist completed settlement history
 
-### 4. Analytics
+### Analytics and AI
 
-- Category-wise spend breakdown
-- Daily spending chart for recent expenses
-- AI insights panel for spending patterns
+- category distribution chart
+- daily spending chart
+- AI insight panel
+- AI categorization on description blur
+- local fallback insights when external AI is unavailable
 
-### 5. AI Features
-
-- Expense category suggestion from description
-- Spending insights based on expense history
-- Local fallback logic when `ANTHROPIC_API_KEY` is not configured
-
-## Local Setup
+## Setup
 
 ### Prerequisites
 
@@ -129,15 +211,15 @@ npm install
 
 ### Environment Variables
 
-Create `.env.local` if you want live AI responses:
+Create `.env.local` to enable live AI calls:
 
 ```env
 ANTHROPIC_API_KEY=your_key_here
 ```
 
-Without this key, the app still works and uses local fallback logic for AI features.
+Without this key, the app still works. It automatically falls back to local categorization and locally generated insights.
 
-### Run
+### Run Locally
 
 ```bash
 npm run dev
@@ -147,7 +229,7 @@ Open `http://localhost:3000`.
 
 ## Verification
 
-Commands used after the updates:
+The project was verified with:
 
 ```bash
 npm run lint
@@ -155,32 +237,30 @@ npx tsc --noEmit
 npm run build
 ```
 
-All three completed successfully.
-
 ## Deployment
+
+The PDF requires deployment on Vercel or Netlify. The project is deployment-ready, but the final deployment itself must be done from your own account.
 
 ### Vercel
 
-```bash
-npm run build
-```
-
-Then import the repository into Vercel and add `ANTHROPIC_API_KEY` if AI features should use Anthropic.
+- import the project into Vercel
+- set `ANTHROPIC_API_KEY` if you want live AI responses
+- deploy
 
 ### Netlify
 
-- Build command: `npm run build`
-- Publish directory: `.next`
-
-## Notes
-
-- Data is persisted in browser `localStorage`, so it is device/browser local by design.
-- Real multi-user sync is not implemented because the assignment did not require a full backend.
-- Deployment still needs to be done from your GitHub/Vercel/Netlify account.
+- build command: `npm run build`
+- publish directory: `.next`
 
 ## Submission Checklist
 
-- Public GitHub repository
-- Updated README
-- Demo video under 5 minutes
-- Deployed app link
+- public GitHub repository
+- updated README
+- demo video under 5 minutes
+- deployed app link
+
+## Notes
+
+- data is browser-local by design because the assignment did not require a full backend
+- multi-user cloud sync is not implemented
+- the core assignment requirements from the PDF are implemented in this repository

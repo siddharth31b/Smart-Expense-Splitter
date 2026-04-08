@@ -1,8 +1,9 @@
 "use client";
+
+import { useRouter } from "next/navigation";
+import { ArrowRight, Receipt, Trash2, Users } from "lucide-react";
 import { Group } from "@/types";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { Users, Receipt, ArrowRight, Trash2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 interface Props {
   group: Group;
@@ -11,51 +12,56 @@ interface Props {
 
 export function GroupCard({ group, onDelete }: Props) {
   const router = useRouter();
-  const totalExpenses = group.expenses.reduce((s, e) => s + e.amount, 0);
+  const totalExpenses = group.expenses.reduce((sum, expense) => sum + expense.amount, 0);
 
   return (
     <div
-      className="glass-card p-5 cursor-pointer hover:border-emerald-500/30 transition-all duration-200 group/card relative"
+      className="glass-card group/card relative cursor-pointer p-5 transition-all duration-200 hover:border-emerald-500/30"
       onClick={() => router.push(`/groups/${group.id}`)}
     >
-      {/* Delete button */}
       <button
-        onClick={(e) => { e.stopPropagation(); onDelete(group.id); }}
-        className="absolute top-4 right-4 p-1.5 rounded-lg opacity-0 group-hover/card:opacity-100 hover:bg-red-500/20 text-slate-500 hover:text-red-400 transition-all"
+        onClick={(event) => {
+          event.stopPropagation();
+          onDelete(group.id);
+        }}
+        className="absolute right-4 top-4 rounded-lg p-1.5 text-slate-500 opacity-0 transition-all group-hover/card:opacity-100 hover:bg-red-500/20 hover:text-red-400"
       >
         <Trash2 size={14} />
       </button>
 
       <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
+        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10">
           <Users size={22} className="text-emerald-400" />
         </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-white truncate">{group.name}</h3>
+        <div className="min-w-0 flex-1">
+          <h3 className="truncate font-semibold text-white">{group.name}</h3>
           {group.description && (
-            <p className="text-xs text-slate-500 mt-0.5 truncate">{group.description}</p>
+            <p className="mt-0.5 truncate text-xs text-slate-500">{group.description}</p>
           )}
-          <div className="flex items-center gap-3 mt-2">
+          <div className="mt-2 flex items-center gap-3">
             <span className="text-xs text-slate-400">
-              <span className="text-white font-medium">{group.members.length}</span> members
+              <span className="font-medium text-white">{group.members.length}</span> members
             </span>
             <span className="text-slate-600">·</span>
-            <span className="text-xs text-slate-400 flex items-center gap-1">
+            <span className="flex items-center gap-1 text-xs text-slate-400">
               <Receipt size={11} />
-              <span className="text-white font-medium">{group.expenses.length}</span> expenses
+              <span className="font-medium text-white">{group.expenses.length}</span> expenses
             </span>
           </div>
         </div>
       </div>
 
-      <div className="mt-4 pt-4 border-t border-surface-border flex items-center justify-between">
+      <div className="mt-4 flex items-center justify-between border-t border-surface-border pt-4">
         <div>
           <p className="text-xs text-slate-500">Total Spent</p>
           <p className="text-base font-bold text-white">{formatCurrency(totalExpenses)}</p>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs text-slate-500">{formatDate(group.createdAt)}</span>
-          <ArrowRight size={16} className="text-emerald-400 group-hover/card:translate-x-1 transition-transform" />
+          <ArrowRight
+            size={16}
+            className="text-emerald-400 transition-transform group-hover/card:translate-x-1"
+          />
         </div>
       </div>
     </div>

@@ -16,10 +16,11 @@ import {
 import { AddExpenseModal } from "@/components/expenses/AddExpenseModal";
 import { ExpenseList } from "@/components/expenses/ExpenseList";
 import { AddMemberModal } from "@/components/groups/AddMemberModal";
-import { BalanceCard } from "@/components/settlements/BalanceCard";
-import { SettlementList } from "@/components/settlements/SettlementList";
 import { SpendingChart } from "@/components/dashboard/SpendingChart";
 import { AIInsightsPanel } from "@/components/dashboard/AIInsightsPanel";
+import { MemberChip } from "@/components/ui/MemberChip";
+import { BalanceCard } from "@/components/settlements/BalanceCard";
+import { SettlementList } from "@/components/settlements/SettlementList";
 import { useGroups } from "@/hooks/useGroups";
 import { calculateBalances, calculateSettlements } from "@/lib/calculations";
 import { formatCurrency, formatDate } from "@/lib/utils";
@@ -140,17 +141,10 @@ export default function GroupPage({ params }: PageProps) {
                   <p className="text-sm text-slate-500">{group.description}</p>
                 )}
 
-                <div className="mt-3 flex items-center gap-3 flex-wrap">
-                  <div className="flex flex-wrap gap-2">
-                    {group.members.map((member) => (
-                      <span
-                        key={member.id}
-                        className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300"
-                      >
-                        {member.name}
-                      </span>
-                    ))}
-                  </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {group.members.map((member) => (
+                    <MemberChip key={member.id} name={member.name} className="px-3" />
+                  ))}
                 </div>
               </div>
             </div>

@@ -1,8 +1,15 @@
 "use client";
+
 import { useState } from "react";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
-import { Group, Expense, ExpenseCategory, SplitType, ExpenseSplit } from "@/types";
+import {
+  Expense,
+  ExpenseCategory,
+  ExpenseSplit,
+  Group,
+  SplitType,
+} from "@/types";
 import { ALL_CATEGORIES, CATEGORY_META } from "@/lib/utils";
 
 interface Props {
@@ -34,13 +41,14 @@ export function AddExpenseModal({ open, onClose, group, onAdded }: Props) {
     group.members.forEach((member) => {
       nextSplits[member.id] = perPerson;
     });
+
     return nextSplits;
   };
 
-  // AI categorize on description blur
   const handleDescriptionBlur = async () => {
     if (!description.trim() || description.length < 3) return;
     setAiLoading(true);
+
     try {
       const res = await fetch("/api/ai", {
         method: "POST",
@@ -53,7 +61,7 @@ export function AddExpenseModal({ open, onClose, group, onAdded }: Props) {
         setAiCategorized(true);
       }
     } catch {
-      // silent fail
+      // Silent fallback keeps the expense flow lightweight.
     } finally {
       setAiLoading(false);
     }
@@ -73,32 +81,49 @@ export function AddExpenseModal({ open, onClose, group, onAdded }: Props) {
 
   const buildSplits = (): ExpenseSplit[] => {
     const total = parseFloat(amount);
+
     if (splitType === "equal") {
       const each = Math.round((total / group.members.length) * 100) / 100;
-      return group.members.map((m, i) => ({
-        memberId: m.id,
-        amount: i === group.members.length - 1
-          ? Math.round((total - each * (group.members.length - 1)) * 100) / 100
-          : each,
+      return group.members.map((member, index) => ({
+        memberId: member.id,
+        amount:
+          index === group.members.length - 1
+            ? Math.round((total - each * (group.members.length - 1)) * 100) / 100
+            : each,
       }));
     }
-    return group.members.map((m) => ({
-      memberId: m.id,
-      amount: parseFloat(customSplits[m.id] ?? "0") || 0,
+
+    return group.members.map((member) => ({
+      memberId: member.id,
+      amount: parseFloat(customSplits[member.id] ?? "0") || 0,
     }));
   };
 
   const handleSubmit = async () => {
     setError("");
-    if (!description.trim()) { setError("Description is required."); return; }
-    const amt = parseFloat(amount);
-    if (!amt || amt <= 0) { setError("Enter a valid amount."); return; }
-    if (!paidBy) { setError("Select who paid."); return; }
+
+    if (!description.trim()) {
+      setError("Description is required.");
+      return;
+    }
+
+    const parsedAmount = parseFloat(amount);
+    if (!parsedAmount || parsedAmount <= 0) {
+      setError("Enter a valid amount.");
+      return;
+    }
+
+    if (!paidBy) {
+      setError("Select who paid.");
+      return;
+    }
 
     const splits = buildSplits();
-    const splitsTotal = splits.reduce((s, sp) => s + sp.amount, 0);
-    if (Math.abs(splitsTotal - amt) > 0.05) {
-      setError(`Split total (₹${splitsTotal.toFixed(2)}) must equal amount (₹${amt.toFixed(2)}).`);
+    const splitsTotal = splits.reduce((sum, split) => sum + split.amount, 0);
+    if (Math.abs(splitsTotal - parsedAmount) > 0.05) {
+      setError(
+        `Split total (INR ${splitsTotal.toFixed(2)}) must equal amount (INR ${parsedAmount.toFixed(2)}).`
+      );
       return;
     }
 
@@ -110,7 +135,7 @@ export function AddExpenseModal({ open, onClose, group, onAdded }: Props) {
         body: JSON.stringify({
           groupId: group.id,
           description,
-          amount: amt,
+          amount: parsedAmount,
           currency: "INR",
           category,
           paidBy,
@@ -121,11 +146,18 @@ export function AddExpenseModal({ open, onClose, group, onAdded }: Props) {
         }),
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.error ?? "Failed to add expense."); return; }
+
+      if (!res.ok) {
+        setError(data.error ?? "Failed to add expense.");
+        return;
+      }
+
       onAdded(data.expense);
-      // Reset form
-      setDescription(""); setAmount(""); setCategory("other");
-      setPaidBy(group.members[0]?.id ?? ""); setSplitType("equal");
+      setDescription("");
+      setAmount("");
+      setCategory("other");
+      setPaidBy(group.members[0]?.id ?? "");
+      setSplitType("equal");
       setCustomSplits({});
       setDate(new Date().toISOString().slice(0, 10));
       setAiCategorized(false);
@@ -140,14 +172,16 @@ export function AddExpenseModal({ open, onClose, group, onAdded }: Props) {
   return (
     <Modal open={open} onClose={onClose} title="Add Expense" size="md">
       <div className="space-y-4">
-        {/* Description */}
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1.5">
+          <label className="mb-1.5 block text-xs font-medium text-slate-400">
             Description *
-            {aiLoading && <Loader2 size={11} className="inline ml-2 animate-spin text-emerald-400" />}
+            {aiLoading && (
+              <Loader2 size={11} className="ml-2 inline animate-spin text-emerald-400" />
+            )}
             {aiCategorized && !aiLoading && (
-              <span className="ml-2 text-emerald-400 text-xs flex items-center gap-1 inline-flex">
-                <Sparkles size={11} /> AI categorized
+              <span className="ml-2 inline-flex items-center gap-1 text-xs text-emerald-400">
+                <Sparkles size={11} />
+                AI categorized
               </span>
             )}
           </label>
@@ -155,15 +189,19 @@ export function AddExpenseModal({ open, onClose, group, onAdded }: Props) {
             className="input-dark"
             placeholder="e.g. Dinner at Pizza Hut"
             value={description}
-            onChange={(e) => { setDescription(e.target.value); setAiCategorized(false); }}
+            onChange={(event) => {
+              setDescription(event.target.value);
+              setAiCategorized(false);
+            }}
             onBlur={handleDescriptionBlur}
           />
         </div>
 
-        {/* Amount & Date */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Amount (₹) *</label>
+            <label className="mb-1.5 block text-xs font-medium text-slate-400">
+              Amount (INR) *
+            </label>
             <input
               className="input-dark"
               type="number"
@@ -171,43 +209,45 @@ export function AddExpenseModal({ open, onClose, group, onAdded }: Props) {
               step="0.01"
               placeholder="0.00"
               value={amount}
-              onChange={(e) => {
-                setAmount(e.target.value);
+              onChange={(event) => {
+                setAmount(event.target.value);
                 if (splitType === "custom" && Object.keys(customSplits).length === 0) {
-                  setCustomSplits(buildDefaultCustomSplits(e.target.value));
+                  setCustomSplits(buildDefaultCustomSplits(event.target.value));
                 }
               }}
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">Date</label>
+            <label className="mb-1.5 block text-xs font-medium text-slate-400">Date</label>
             <input
               className="input-dark"
               type="date"
               value={date}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={(event) => setDate(event.target.value)}
               style={{ colorScheme: "dark" }}
             />
           </div>
         </div>
 
-        {/* Category */}
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1.5">Category</label>
+          <label className="mb-1.5 block text-xs font-medium text-slate-400">Category</label>
           <div className="grid grid-cols-4 gap-1.5">
-            {ALL_CATEGORIES.map((cat) => {
-              const meta = CATEGORY_META[cat];
+            {ALL_CATEGORIES.map((currentCategory) => {
+              const meta = CATEGORY_META[currentCategory];
               return (
                 <button
-                  key={cat}
-                  onClick={() => { setCategory(cat); setAiCategorized(false); }}
-                  className={`p-2 rounded-lg border text-center text-xs transition-all ${
-                    category === cat
+                  key={currentCategory}
+                  onClick={() => {
+                    setCategory(currentCategory);
+                    setAiCategorized(false);
+                  }}
+                  className={`rounded-lg border p-2 text-center text-xs transition-all ${
+                    category === currentCategory
                       ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-300"
-                      : "border-surface-border bg-surface hover:border-slate-600 text-slate-400"
+                      : "border-surface-border bg-surface text-slate-400 hover:border-slate-600"
                   }`}
                 >
-                  <div className="text-base mb-0.5">{meta.emoji}</div>
+                  <div className="mb-0.5 text-base">{meta.emoji}</div>
                   <div className="truncate">{meta.label.split(" ")[0]}</div>
                 </button>
               );
@@ -215,36 +255,36 @@ export function AddExpenseModal({ open, onClose, group, onAdded }: Props) {
           </div>
         </div>
 
-        {/* Paid By */}
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-1.5">Paid By *</label>
+          <label className="mb-1.5 block text-xs font-medium text-slate-400">Paid By *</label>
           <select
             className="input-dark"
             value={paidBy}
-            onChange={(e) => setPaidBy(e.target.value)}
+            onChange={(event) => setPaidBy(event.target.value)}
             style={{ colorScheme: "dark" }}
           >
-            {group.members.map((m) => (
-              <option key={m.id} value={m.id}>{m.name}</option>
+            {group.members.map((member) => (
+              <option key={member.id} value={member.id}>
+                {member.name}
+              </option>
             ))}
           </select>
         </div>
 
-        {/* Split Type */}
         <div>
-          <label className="block text-xs font-medium text-slate-400 mb-2">Split</label>
-          <div className="flex gap-2 mb-3">
-            {(["equal", "custom"] as SplitType[]).map((t) => (
+          <label className="mb-2 block text-xs font-medium text-slate-400">Split</label>
+          <div className="mb-3 flex gap-2">
+            {(["equal", "custom"] as SplitType[]).map((type) => (
               <button
-                key={t}
-                onClick={() => handleSplitTypeChange(t)}
-                className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-all ${
-                  splitType === t
+                key={type}
+                onClick={() => handleSplitTypeChange(type)}
+                className={`flex-1 rounded-lg border py-2 text-sm font-medium transition-all ${
+                  splitType === type
                     ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-300"
                     : "border-surface-border text-slate-400 hover:border-slate-600"
                 }`}
               >
-                {t === "equal" ? "⚖️ Equal" : "✏️ Custom"}
+                {type === "equal" ? "Equal" : "Custom"}
               </button>
             ))}
           </div>
@@ -252,20 +292,26 @@ export function AddExpenseModal({ open, onClose, group, onAdded }: Props) {
           {splitType === "custom" && (
             <div className="space-y-2">
               <div className="rounded-xl border border-surface-border bg-surface p-3 text-xs text-slate-400">
-                Assigned {customSplitTotal.toFixed(2)} of {(parseFloat(amount) || 0).toFixed(2)}
+                Assigned {customSplitTotal.toFixed(2)} of{" "}
+                {(parseFloat(amount) || 0).toFixed(2)}
               </div>
-              {group.members.map((m) => (
-                <div key={m.id} className="flex items-center gap-3">
-                  <span className="text-sm text-slate-300 w-28 truncate">{m.name}</span>
+              {group.members.map((member) => (
+                <div key={member.id} className="flex items-center gap-3">
+                  <span className="w-28 truncate text-sm text-slate-300">
+                    {member.name}
+                  </span>
                   <input
                     className="input-dark"
                     type="number"
                     min="0"
                     step="0.01"
                     placeholder="0.00"
-                    value={customSplits[m.id] ?? ""}
-                    onChange={(e) =>
-                      setCustomSplits((s) => ({ ...s, [m.id]: e.target.value }))
+                    value={customSplits[member.id] ?? ""}
+                    onChange={(event) =>
+                      setCustomSplits((current) => ({
+                        ...current,
+                        [member.id]: event.target.value,
+                      }))
                     }
                   />
                 </div>
@@ -275,15 +321,20 @@ export function AddExpenseModal({ open, onClose, group, onAdded }: Props) {
         </div>
 
         {error && (
-          <p className="text-sm text-red-400 bg-red-500/10 rounded-lg px-3 py-2">{error}</p>
+          <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-400">
+            {error}
+          </p>
         )}
 
         <div className="flex gap-3 pt-1">
-          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-surface-border text-slate-400 hover:text-white text-sm font-medium transition-colors">
+          <button
+            onClick={onClose}
+            className="flex-1 rounded-xl border border-surface-border py-2.5 text-sm font-medium text-slate-400 transition-colors hover:text-white"
+          >
             Cancel
           </button>
           <button onClick={handleSubmit} disabled={loading} className="btn-primary flex-1">
-            {loading ? "Adding…" : "Add Expense"}
+            {loading ? "Adding..." : "Add Expense"}
           </button>
         </div>
       </div>
